@@ -1,37 +1,24 @@
 import { useKV } from '@github/spark/hooks'
 import { useState, useEffect } from 'react'
-import { Badge } from '@/components/ui/badg
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-  Lightni
-  Play,
-  ArrowsC
-  Cross
+import { 
+  Eye, 
+  Warning, 
+  CheckCircle, 
+  Robot, 
+  ChartLine,
   Siren,
-  Scan,
-} from '@p
-import { cn 
-import Se
-  Battery,
-export 
-  Pause,
-    containedThrea
-    aiConfi
-    recommen
-
-  const 
-  VideoCamera,
-  useEf
-  Activity
-          id: 'robot-1',
-          type: 'security',
-          battery: 87,
-          capabilities: ['Threat Detection', 'Facial Recognition', 'Weapon Scanning', 'Communi
-          coordinates: { x: 10, y: 5, z: 1 },
+  Play,
+  Pause
+} from '@phosphor-icons/react'
+import { cn } from '@/lib/utils'
 import ThreatDashboard from '@/components/ThreatDashboard'
 import SecurityEventsList from '@/components/SecurityEventsList'
+import SecurityRobotMonitor from '@/components/SecurityRobotMonitor'
+import type { ThreatAssessment, SecurityEvent, SecurityRobot, ThreatLevel } from '@/lib/types'
 
 export default function SecurityView() {
   const [threatAssessment, setThreatAssessment] = useKV<ThreatAssessment>('threat-assessment', {
@@ -50,7 +37,7 @@ export default function SecurityView() {
   const [isMonitoring, setIsMonitoring] = useState(true)
 
   useEffect(() => {
-    if (robots.length === 0) {
+    if (!robots || robots.length === 0) {
       const initialRobots: SecurityRobot[] = [
         {
           id: 'robot-1',
@@ -61,199 +48,138 @@ export default function SecurityView() {
           location: 'Economy Zone A',
           capabilities: ['Threat Detection', 'Facial Recognition', 'Weapon Scanning', 'Communication'],
           lastMaintenance: Date.now() - 86400000 * 3,
-          coordinates: { x: 10, y: 5, z: 1 },
-          { type: 'su
-          { type: 'unauthorized-d
-        ] 
-        c
-        
-          id: `event-${Date.no
-          threatLevel: ev
-          description: `AI-dete
-          timestamp: D
-          status: 'active'
-        
-        
-          ...current!,
-          overallThre
-        }))
-        to
+          coordinates: { x: 10, y: 5, z: 1 }
+        },
+        {
+          id: 'robot-2',
+          name: 'Guardian Beta',
+          type: 'patrol',
+          status: 'patrolling',
+          battery: 92,
+          location: 'Business Class',
+          capabilities: ['Patrol', 'Surveillance', 'Communication'],
+          lastMaintenance: Date.now() - 86400000 * 5,
+          coordinates: { x: 15, y: 8, z: 2 }
+        },
+        {
+          id: 'robot-3',
+          name: 'Sentinel One',
+          type: 'inspection',
+          status: 'idle',
+          battery: 65,
+          location: 'Galley Station 3',
+          capabilities: ['Inspection', 'Temperature Scanning', 'Air Quality Monitoring'],
+          lastMaintenance: Date.now() - 86400000 * 1,
+          coordinates: { x: 20, y: 12, z: 1 }
         }
-      
-        (currentRobots || []).map(
-          battery: Math.max(0
-                  robot.b
-                  robo
-            x: robot.coordina
-            z: robot.coordinates!.z
-        }))
-    }, 10000)
-    return () => cle
+      ]
+      setRobots(initialRobots)
+    }
 
-    const
-
-      (current || []).map(r =>
-          ? { ...r, status
-      )
-
-
-      setRobots(current => 
-          r.id === robotId 
-            : r
-      )
-  }
-  const g
-      case 'none': retur
-      case 'medium': return 'text-wa
-      case 'critical': return 'tex
-  }
-  const getThreatBadge
-      case 'none': return 'default'
-      case 'medium': return 'outline'
-      case 'critical': return 'destructive'
-  }
-  return (
-      <di
-       
-          </div>
-     
-          </div>
-
-          <Button
-            onClick={() => se
-
-            {isMonitoring ? 'Monitoring 
-        </div>
-      
-        <Card className="p
-            <span className=
-          </div>
-            {(threatAssessment?.overallThreatLevel || 'none').toUpperCase()}
-          <p className="text-xs text-muted-foreground mt-1">
-          </p>
-
-        
-            <Warning className="w-5 h-5 text-warning" weight="fill" />
-          <div className="text-3xl font-bold text-warning">
-        
-        </Card>
-        <Card className="p-4 bg-grad
-            <span className
-          </div>
-          title: event.title,
-          <p className="text-xs text-muted-foreground mt-1">Successfully resolved</p>
-
-          <div className="flex i
+    if (!securityEvents || securityEvents.length === 0) {
+      const initialEvents: SecurityEvent[] = [
+        {
+          id: 'event-1',
+          type: 'suspicious-behavior',
+          threatLevel: 'low',
+          title: 'Passenger Movement Pattern Detected',
+          description: 'AI detected unusual movement pattern in Economy Zone B',
+          location: 'Economy Zone B - Row 32',
+          timestamp: Date.now() - 300000,
           detectedBy: 'ai',
-          <div className="
+          status: 'investigating',
+          assignedRobots: ['robot-1']
         }
-        
+      ]
+      setSecurityEvents(initialEvents)
+    }
+  }, [robots, securityEvents, setRobots, setSecurityEvents])
 
-        
-        setThreatAssessment(current => ({
-          </TabsTrigge
-            <Siren className="w-4 h-4" weight="fill" />
-          </TabsTrigger>
-          lastUpdated: Date.now()
-          <
+  useEffect(() => {
+    if (!isMonitoring) return
 
-          <ThreatDashboard 
-            events={securityEvents || []}
-          
-      }
-      
+    const interval = setInterval(() => {
       setRobots(currentRobots => 
-              setSecurityEvents(current =>
+        (currentRobots || []).map(robot => ({
           ...robot,
-            onDeployRobot={deployRobot}
-          />
-
-          <SecurityRobotMonitor 
-            onUpdateRobot={(rob
-                (current || []).map(r => r.id === robotI
-            }}
-            y: robot.coordinates!.y + (Math.random() - 0.5) * 2,
-      </Tabs>
+          battery: Math.max(0, robot.battery - (robot.status === 'patrolling' || robot.status === 'investigating' ? 0.5 : 0.1)),
+          coordinates: robot.status === 'patrolling' && robot.coordinates ? {
+            x: robot.coordinates.x + (Math.random() - 0.5) * 2,
+            y: robot.coordinates.y + (Math.random() - 0.5) * 2,
+            z: robot.coordinates.z
           } : robot.coordinates
-
+        }))
       )
+    }, 10000)
 
+    return () => clearInterval(interval)
+  }, [isMonitoring, setRobots])
 
-
-
-
-
-
+  const deployRobot = (robotId: string, location: string) => {
+    const robot = robots?.find(r => r.id === robotId)
     if (!robot) return
 
     setRobots(current => 
-
+      (current || []).map(r =>
         r.id === robotId 
-
+          ? { ...r, status: 'responding' as const, location }
           : r
-
+      )
     )
 
-
-
     setTimeout(() => {
-
+      setRobots(current => 
         (current || []).map(r => 
-
-
-
+          r.id === robotId 
+            ? { ...r, status: 'investigating' as const }
+            : r
         )
+      )
+    }, 3000)
+  }
 
-
-
-
-
+  const getThreatColor = (level: ThreatLevel) => {
     switch (level) {
-
-
-
-
-
+      case 'none': return 'text-success'
+      case 'low': return 'text-muted-foreground'
+      case 'medium': return 'text-warning'
+      case 'high': return 'text-destructive'
+      case 'critical': return 'text-critical'
     }
+  }
 
-
-
+  const getThreatBadgeVariant = (level: ThreatLevel) => {
     switch (level) {
-
+      case 'none': return 'default'
       case 'low': return 'secondary'
-
+      case 'medium': return 'outline'
       case 'high': return 'destructive'
-
+      case 'critical': return 'destructive'
     }
+  }
 
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-semibold text-foreground">Security & Threat Detection</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            AI-powered security monitoring and autonomous robot fleet management
+          </p>
+        </div>
 
+        <Button
+          onClick={() => setIsMonitoring(!isMonitoring)}
+          variant={isMonitoring ? 'default' : 'outline'}
+          className="gap-2"
+        >
+          {isMonitoring ? <Pause className="w-4 h-4" weight="fill" /> : <Play className="w-4 h-4" weight="fill" />}
+          {isMonitoring ? 'Monitoring Active' : 'Start Monitoring'}
+        </Button>
+      </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          </Button>
-
-
-
-
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-4 bg-gradient-to-br from-primary/5 to-primary/10">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-muted-foreground">Threat Level</span>
             <Eye className="w-5 h-5 text-primary" weight="fill" />
@@ -294,16 +220,16 @@ export default function SecurityView() {
             <Robot className="w-5 h-5 text-accent" weight="fill" />
           </div>
           <div className="text-3xl font-bold text-foreground">
-            {robots.filter(r => r.status === 'patrolling' || r.status === 'investigating' || r.status === 'responding').length}
+            {robots?.filter(r => r.status === 'patrolling' || r.status === 'investigating' || r.status === 'responding').length || 0}
           </div>
-          <p className="text-xs text-muted-foreground mt-1">Out of {robots.length} total</p>
+          <p className="text-xs text-muted-foreground mt-1">Out of {robots?.length || 0} total</p>
         </Card>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview" className="gap-2">
-            <Activity className="w-4 h-4" weight="fill" />
+            <ChartLine className="w-4 h-4" weight="fill" />
             Overview
           </TabsTrigger>
           <TabsTrigger value="events" className="gap-2">
@@ -319,28 +245,28 @@ export default function SecurityView() {
         <TabsContent value="overview" className="mt-6">
           <ThreatDashboard 
             assessment={threatAssessment!}
-            events={securityEvents}
-            robots={robots}
+            events={securityEvents || []}
+            robots={robots || []}
             onDeployRobot={deployRobot}
           />
         </TabsContent>
 
         <TabsContent value="events" className="mt-6">
           <SecurityEventsList 
-            events={securityEvents}
+            events={securityEvents || []}
             onUpdateEvent={(eventId, updates) => {
               setSecurityEvents(current =>
                 (current || []).map(e => e.id === eventId ? { ...e, ...updates } : e)
               )
             }}
             onDeployRobot={deployRobot}
-            availableRobots={robots.filter(r => r.status === 'idle' || r.status === 'patrolling')}
+            availableRobots={robots?.filter(r => r.status === 'idle' || r.status === 'patrolling') || []}
           />
         </TabsContent>
 
         <TabsContent value="robots" className="mt-6">
           <SecurityRobotMonitor 
-            robots={robots}
+            robots={robots || []}
             onUpdateRobot={(robotId, updates) => {
               setRobots(current =>
                 (current || []).map(r => r.id === robotId ? { ...r, ...updates } : r)
