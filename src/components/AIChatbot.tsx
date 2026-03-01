@@ -12,7 +12,15 @@ import {
   VideoCamera,
   FileText,
   Trash,
-  SpinnerGap
+  SpinnerGap,
+  BookOpen,
+  FirstAid,
+  Package,
+  Users,
+  Lightning,
+  Airplane,
+  ListChecks,
+  IdentificationCard
 } from '@phosphor-icons/react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -39,6 +47,14 @@ interface Attachment {
   preview?: string
 }
 
+interface QuickAction {
+  id: string
+  label: string
+  icon: React.ReactNode
+  prompt: string
+  category: 'procedure' | 'passenger' | 'inventory' | 'emergency' | 'document'
+}
+
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useKV<Message[]>('ai-chat-messages', [])
@@ -47,6 +63,7 @@ export default function AIChatbot() {
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [hasNewMessage, setHasNewMessage] = useState(false)
+  const [showQuickActions, setShowQuickActions] = useState(true)
   
   const fileInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
@@ -54,6 +71,65 @@ export default function AIChatbot() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
+
+  const quickActions: QuickAction[] = [
+    {
+      id: 'emergency-procedure',
+      label: 'Emergency Procedures',
+      icon: <FirstAid className="w-4 h-4" weight="fill" />,
+      prompt: 'Provide a quick reference guide for common in-flight emergency procedures, including medical emergencies, fire response, and evacuation protocols.',
+      category: 'emergency'
+    },
+    {
+      id: 'check-procedure',
+      label: 'Safety Checklist',
+      icon: <ListChecks className="w-4 h-4" weight="fill" />,
+      prompt: 'Show me the pre-flight safety checklist for cabin crew, including all required safety equipment checks and cabin preparation steps.',
+      category: 'procedure'
+    },
+    {
+      id: 'passenger-assistance',
+      label: 'Passenger Assistance',
+      icon: <Users className="w-4 h-4" weight="fill" />,
+      prompt: 'What are the best practices for assisting passengers with special needs, including mobility issues, medical conditions, and language barriers?',
+      category: 'passenger'
+    },
+    {
+      id: 'document-verification',
+      label: 'Document Verification',
+      icon: <IdentificationCard className="w-4 h-4" weight="fill" />,
+      prompt: 'Guide me through verifying passenger travel documents, including passport checks, visa requirements, and boarding pass validation.',
+      category: 'document'
+    },
+    {
+      id: 'inventory-check',
+      label: 'Inventory Guidelines',
+      icon: <Package className="w-4 h-4" weight="fill" />,
+      prompt: 'What are the procedures for inventory management during flight, including stock checking, consumption tracking, and reporting low supplies?',
+      category: 'inventory'
+    },
+    {
+      id: 'service-protocol',
+      label: 'Service Protocols',
+      icon: <Airplane className="w-4 h-4" weight="fill" />,
+      prompt: 'Explain the standard service protocols for different flight phases, including meal service, beverage service, and duty-free sales procedures.',
+      category: 'procedure'
+    },
+    {
+      id: 'incident-reporting',
+      label: 'Incident Reporting',
+      icon: <FileText className="w-4 h-4" weight="fill" />,
+      prompt: 'How do I properly document and report in-flight incidents? What information is required and what are the reporting procedures?',
+      category: 'document'
+    },
+    {
+      id: 'medical-assistance',
+      label: 'Medical Response',
+      icon: <FirstAid className="w-4 h-4" weight="fill" />,
+      prompt: 'What are the steps for handling medical emergencies on board, including first aid procedures, using medical equipment, and when to request ground medical support?',
+      category: 'emergency'
+    }
+  ]
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -69,6 +145,14 @@ export default function AIChatbot() {
       }
     }
   }, [messages, isOpen])
+
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      setShowQuickActions(false)
+    } else {
+      setShowQuickActions(true)
+    }
+  }, [messages])
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>, type: 'document' | 'image' | 'video') => {
     const files = event.target.files
@@ -163,6 +247,15 @@ export default function AIChatbot() {
       mediaRecorderRef.current.stop()
       setIsRecording(false)
     }
+  }
+
+  const handleQuickAction = async (action: QuickAction) => {
+    setInput(action.prompt)
+    toast.info(`Quick action: ${action.label}`)
+    
+    setTimeout(() => {
+      sendMessage()
+    }, 100)
   }
 
   const sendMessage = async () => {
@@ -335,14 +428,41 @@ Provide a helpful, detailed response focused on cabin operations support.`
               <ScrollArea className="flex-1 p-4" ref={scrollRef}>
                 <div className="space-y-4">
                   {(!messages || messages.length === 0) && (
-                    <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                    <div className="flex flex-col items-center justify-center text-center py-8">
                       <div className="p-4 bg-primary/10 rounded-full mb-4">
                         <ChatCircleDots className="w-12 h-12 text-primary" weight="fill" />
                       </div>
                       <h4 className="font-semibold text-foreground mb-2">AI Assistant Ready</h4>
-                      <p className="text-sm text-muted-foreground max-w-xs">
+                      <p className="text-sm text-muted-foreground max-w-xs mb-6">
                         I can help you with tickets, documents, images, videos, and cabin operations. Upload files or ask me anything!
                       </p>
+                      
+                      <div className="w-full space-y-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Lightning className="w-4 h-4 text-accent" weight="fill" />
+                          <span className="text-xs font-semibold text-foreground uppercase tracking-wide">Quick Actions</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {quickActions.map((action) => (
+                            <motion.button
+                              key={action.id}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => handleQuickAction(action)}
+                              className="flex flex-col items-start gap-2 p-3 bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 border border-border rounded-lg transition-all duration-200 text-left group"
+                            >
+                              <div className="flex items-center gap-2 w-full">
+                                <div className="p-1.5 bg-primary/10 group-hover:bg-primary/20 rounded-md transition-colors">
+                                  {action.icon}
+                                </div>
+                              </div>
+                              <span className="text-xs font-medium text-foreground line-clamp-2">
+                                {action.label}
+                              </span>
+                            </motion.button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   )}
 
