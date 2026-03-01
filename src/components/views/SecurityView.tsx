@@ -1,12 +1,8 @@
 import { useKV } from '@github/spark/hooks'
 import { useState, useEffect } from 'react'
-import { 
-  Robot,
-import { 
-  ShieldCheck,
-  Robot,
-  Warning
-} from '@phosphor-icons/react'
+import { ShieldCheck, Robot, Warning } from '@phosphor-icons/react'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
 import ThreatDashboard from '@/components/ThreatDashboard'
 import SecurityRobotMonitor from '@/components/SecurityRobotMonitor'
 import SecurityEventsList from '@/components/SecurityEventsList'
@@ -18,224 +14,198 @@ export default function SecurityView() {
   const [securityEvents, setSecurityEvents] = useKV<SecurityEvent[]>('security-events', [])
   const [threatAssessment, setThreatAssessment] = useKV<ThreatAssessment>('threat-assessment', {
     overallThreatLevel: 'low',
-    if (!robots || ro
+    activeThreats: 0,
     containedThreats: 0,
-          id: 'robo
+    falseAlarms: 0,
     aiConfidence: 95,
-          status: 'patrollin
+    lastUpdated: Date.now(),
     recommendations: []
   })
   const [isMonitoring, setIsMonitoring] = useState(true)
 
   useEffect(() => {
-          name: 'Sentinel Beta',
+    if (!robots || robots.length === 0) {
       const initialRobots: SecurityRobot[] = [
-         
-          id: 'robot-sec-001',
-          lastMaintenance: Date.n
-          type: 'patrol',
         {
+          id: 'robot-sec-001',
+          name: 'Sentinel Alpha',
+          type: 'patrol',
+          status: 'patrolling',
           battery: 87,
           location: 'First Class Cabin',
+          currentTask: 'Perimeter Patrol',
           capabilities: ['Threat Detection', 'Facial Recognition', 'Crowd Analysis'],
           lastMaintenance: Date.now() - 86400000 * 5,
           coordinates: { x: 10, y: 5, z: 1 }
-          
+        },
         {
           id: 'robot-sec-002',
           name: 'Sentinel Beta',
           type: 'inspection',
           status: 'idle',
-          location: 'M
+          battery: 92,
           location: 'Business Class',
+          currentTask: 'Standby',
           capabilities: ['Inspection', 'Temperature Scanning', 'Biohazard Detection'],
           lastMaintenance: Date.now() - 86400000 * 3,
           coordinates: { x: 20, y: 12, z: 1 }
         },
-    if (!
+        {
           id: 'robot-sec-003',
           name: 'Defender Gamma',
           type: 'patrol',
           status: 'charging',
           battery: 23,
-          timestamp: Date.now() - 300
+          location: 'Galley Area',
           currentTask: 'Charging',
           capabilities: ['Perimeter Security', 'Anomaly Detection'],
           lastMaintenance: Date.now() - 86400000 * 7,
+          coordinates: { x: 30, y: 8, z: 1 }
+        }
+      ]
+      setRobots(initialRobots)
+    }
+
+    if (!securityEvents || securityEvents.length === 0) {
+      const initialEvents: SecurityEvent[] = [
+        {
+          id: 'sec-event-001',
+          type: 'alert',
+          severity: 'low',
+          title: 'Unattended Baggage',
+          description: 'Bag detected in aisle without owner nearby',
+          location: 'Row 23B',
+          timestamp: Date.now() - 300000,
+          status: 'investigating',
+          assignedRobot: 'robot-sec-001'
+        }
+      ]
+      setSecurityEvents(initialEvents)
+    }
+  }, [robots, securityEvents, setRobots, setSecurityEvents])
+
+  useEffect(() => {
+    if (!isMonitoring) return
+
+    const interval = setInterval(() => {
+      setThreatAssessment((current) => {
+        const defaultAssessment: ThreatAssessment = {
+          overallThreatLevel: 'low',
+          activeThreats: 0,
+          containedThreats: 0,
+          falseAlarms: 0,
+          aiConfidence: 95,
+          lastUpdated: Date.now(),
+          recommendations: []
+        }
+        
+        const currentAssessment = current || defaultAssessment
+        const active = currentAssessment.activeThreats || 0
+        const contained = currentAssessment.containedThreats || 0
+        const falseAlarms = currentAssessment.falseAlarms || 0
+
+        let overallLevel: ThreatLevel = 'low'
+        if (active > 2) overallLevel = 'critical'
+        else if (active > 0) overallLevel = 'medium'
         else overallLevel = 'low'
 
-        c
-          activeThreats: 0,
-          falseAlarms: 0,
-          lastUpdated: Dat
-        }
         return {
-          overallThreatLevel: over
+          overallThreatLevel: overallLevel,
+          activeThreats: active,
           containedThreats: contained,
+          falseAlarms: falseAlarms,
+          aiConfidence: Math.min(95, 85 + Math.random() * 10),
+          recommendations: active > 0 ? ['Maintain surveillance', 'Keep crew informed'] : [],
           lastUpdated: Date.now()
+        }
       })
+    }, 10000)
 
-  }, [i
-  const handleUpdateEvent = (e
-     
+    return () => clearInterval(interval)
+  }, [isMonitoring, setThreatAssessment])
 
-  }
-  const handleUpdateRobot = (robotId: string, 
-      (cu
+  const handleUpdateEvent = (eventId: string, updates: Partial<SecurityEvent>) => {
+    setSecurityEvents((current) =>
+      (current || []).map(event =>
+        event.id === eventId ? { ...event, ...updates } : event
       )
+    )
   }
-  const handleDeployRobot = (
+
+  const handleUpdateRobot = (robotId: string, updates: Partial<SecurityRobot>) => {
+    setRobots((current) =>
       (current || []).map(robot =>
-          ? { ...robot, status: 'responding', location, currentTask: `Responding
+        robot.id === robotId ? { ...robot, ...updates } : robot
       )
+    )
   }
-  const availableRobots = r
+
+  const handleDeployRobot = (robotId: string, location: string) => {
+    setRobots((current) =>
+      (current || []).map(robot =>
+        robot.id === robotId
+          ? { ...robot, status: 'responding', location, currentTask: `Responding to ${location}` }
+          : robot
+      )
+    )
+  }
+
+  const availableRobots = (robots || []).filter(r => r.status === 'idle' || r.status === 'patrolling')
+
   return (
-      <div className="flex items-center jus
-         
-       
-          variant={isMonitoring ? 'def
-     
-          {isMonitoring ? 'Monitoring Active' : 'Monitoring 
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold text-foreground">Security Operations</h2>
+          <p className="text-sm text-muted-foreground mt-1">AI-powered threat monitoring and autonomous security</p>
+        </div>
+        <Button
+          variant={isMonitoring ? 'default' : 'outline'}
+          onClick={() => setIsMonitoring(!isMonitoring)}
+          className="gap-2"
+        >
+          <ShieldCheck className="w-4 h-4" weight="bold" />
+          {isMonitoring ? 'Monitoring Active' : 'Monitoring Paused'}
+        </Button>
+      </div>
 
-      <Tabs value={
-          <TabsTrigger value=
-
-          <TabsTrigger value="events" cl
-            Events
-          <TabsTrigger value="robots" c
-            Robot F
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="events">Events</TabsTrigger>
+          <TabsTrigger value="robots">Robot Fleet</TabsTrigger>
         </TabsList>
+
         <TabsContent value="overview" className="mt-6">
+          <ThreatDashboard
             assessment={threatAssessment || {
+              overallThreatLevel: 'low',
               activeThreats: 0,
-              falseAlar
-           
-       
-
+              containedThreats: 0,
+              falseAlarms: 0,
+              aiConfidence: 95,
+              lastUpdated: Date.now(),
+              recommendations: []
+            }}
           />
-
-          <SecurityEventsList
-
-            availableRobots={availableRobots
         </TabsContent>
+
+        <TabsContent value="events" className="mt-6">
+          <SecurityEventsList
+            events={securityEvents || []}
+            onUpdateEvent={handleUpdateEvent}
+            availableRobots={availableRobots}
+          />
+        </TabsContent>
+
         <TabsContent value="robots" className="mt-6">
+          <SecurityRobotMonitor
             robots={robots || []}
+            onUpdateRobot={handleUpdateRobot}
             onDeployRobot={handleDeployRobot}
-
+          />
+        </TabsContent>
+      </Tabs>
     </div>
+  )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
