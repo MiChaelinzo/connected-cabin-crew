@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { WarningCircle, CheckCircle, Seat, FirstAid, Clock } from '@phosphor-icons/react'
 import AlertTestPanel from '@/components/AlertTestPanel'
+import SensorMonitor from '@/components/SensorMonitor'
 import type { CabinZone } from '@/lib/types'
 
 export default function DashboardView() {
@@ -142,6 +143,8 @@ export default function DashboardView() {
           )}
         </div>
       </div>
+
+      <SensorMonitor />
 
       <AlertTestPanel />
     </div>

@@ -55,11 +55,18 @@ This platform addresses multiple interconnected operational domains—passenger 
 - **Success criteria**: Zero loss of functionality during offline periods; 100% data integrity after sync; sync completion within 30 seconds of reconnection
 
 ### Real-Time Alert System
-- **Functionality**: Priority-based notification system for critical cabin events with customizable sound alerts and visual indicators
-- **Purpose**: Ensures immediate crew awareness of safety issues, medical emergencies, equipment failures, and passenger needs requiring urgent attention
-- **Trigger**: Critical event occurs in cabin (smoke detected, medical emergency, equipment malfunction, passenger incident)
-- **Progression**: Event detected → Alert generated with priority level → Sound notification plays → Visual badge appears on bell icon → Toast notification displays → Crew opens alert center → Reviews details and action requirements → Acknowledges alert → Takes appropriate action
-- **Success criteria**: 100% alert delivery within 2 seconds of event; distinct sound patterns for different priority levels; zero missed critical alerts; crew can acknowledge/dismiss alerts; historical alert log maintained
+- **Functionality**: Priority-based notification system for critical cabin events with customizable sound alerts and visual indicators; integrated with automated alert generation from cabin sensor data and passenger events
+- **Purpose**: Ensures immediate crew awareness of safety issues, medical emergencies, equipment failures, and passenger needs requiring urgent attention through proactive monitoring and automated detection
+- **Trigger**: Critical event occurs in cabin (smoke detected via sensors, medical emergency via passenger call, equipment malfunction via system diagnostics, cabin environment anomalies, passenger compliance issues)
+- **Progression**: Sensor detects anomaly OR Passenger event triggers → Alert automatically generated with appropriate priority → Alert rules engine evaluates severity → Sound notification plays → Visual badge appears on bell icon → Toast notification displays → Crew opens alert center → Reviews details and action requirements → Acknowledges alert → Takes appropriate action → Resolution logged
+- **Success criteria**: 100% alert delivery within 2 seconds of event; distinct sound patterns for different priority levels; zero missed critical alerts; automated generation from sensor data with <1% false positive rate; crew can acknowledge/dismiss alerts; historical alert log maintained; sensor-to-alert latency under 3 seconds
+
+### Automated Alert Generation
+- **Functionality**: Intelligent alert system that continuously monitors cabin sensor data (temperature, smoke, pressure, oxygen, galley equipment, IFE systems, doors) and passenger events (call buttons, medical alerts, seatbelt violations) to automatically generate contextual alerts
+- **Purpose**: Reduces crew cognitive load by eliminating manual observation requirements; enables proactive issue detection before problems escalate; ensures consistent monitoring across all cabin systems
+- **Trigger**: Continuous background monitoring checks sensor readings every 10 seconds; passenger event handlers fire on button press/system event
+- **Progression**: Sensor reading exceeds threshold OR Passenger event occurs → Alert generation engine evaluates conditions → Alert created with category (safety/medical/equipment/passenger/service), priority (critical/high/medium/low), location, and recommended actions → Alert dispatched to notification system → Crew receives alert via sound + visual + toast → Crew responds
+- **Success criteria**: All sensor anomalies generate alerts within 3 seconds; passenger events trigger alerts within 1 second; alert messages include specific location and actionable guidance; 95%+ crew satisfaction with alert relevance and timing; measurable reduction in incident discovery time
 
 ## Edge Case Handling
 
