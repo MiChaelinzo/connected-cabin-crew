@@ -10,6 +10,7 @@ import ReportsView from '@/components/views/ReportsView'
 import CrewView from '@/components/views/CrewView'
 import AnalyticsView from '@/components/views/AnalyticsView'
 import AlertCenter from '@/components/AlertCenter'
+import DynamicBackground from '@/components/DynamicBackground'
 import { useAlertMonitor } from '@/hooks/use-alert-monitor'
 import { useAutomatedAlerts } from '@/hooks/use-automated-alerts'
 import { useInventoryMonitor } from '@/hooks/use-inventory-monitor'
@@ -132,8 +133,10 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b border-border bg-card shadow-sm">
+    <div className="min-h-screen bg-background relative">
+      <DynamicBackground />
+      <div className="relative z-10">
+      <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md shadow-sm">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <div className="flex flex-col">
@@ -260,6 +263,7 @@ function App() {
           </TabsContent>
         </div>
       </Tabs>
+      </div>
 
       <Toaster />
     </div>

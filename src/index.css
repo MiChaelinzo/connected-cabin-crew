@@ -19,10 +19,10 @@
   --background: oklch(0.96 0.01 250);
   --foreground: oklch(0.20 0.02 250);
 
-  --card: oklch(1 0 0);
+  --card: oklch(1 0 0 / 0.95);
   --card-foreground: oklch(0.20 0.02 250);
   
-  --popover: oklch(1 0 0);
+  --popover: oklch(1 0 0 / 0.98);
   --popover-foreground: oklch(0.20 0.02 250);
 
   --primary: oklch(0.35 0.15 250);
