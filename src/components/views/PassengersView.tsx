@@ -3,15 +3,19 @@ import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { MagnifyingGlass, Airplane, ForkKnife, Coffee, Star, Clock } from '@phosphor-icons/react'
+import { Separator } from '@/components/ui/separator'
+import { MagnifyingGlass, Airplane, ForkKnife, Coffee, Star, Clock, CheckCircle, Prohibit, HourglassHigh, ChatCircleText, Thermometer, Television, Bed, HandHeart } from '@phosphor-icons/react'
+import { toast } from 'sonner'
 import PassengerAssistanceAI from '@/components/PassengerAssistanceAI'
-import type { Passenger } from '@/lib/types'
+import type { Passenger, PassengerRequest, RequestStatus } from '@/lib/types'
 
 export default function PassengersView() {
-  const [passengers] = useKV<Passenger[]>('passengers', [])
+  const [passengers, setPassengers] = useKV<Passenger[]>('passengers', [])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedPassenger, setSelectedPassenger] = useState<Passenger | null>(null)
+  const [requests, setRequests] = useKV<PassengerRequest[]>('passenger-requests', [])
 
   const filteredPassengers = passengers?.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -40,6 +44,106 @@ export default function PassengersView() {
         return null
     }
   }
+
+  const handleQuickReply = async (passengerId: string, type: string, description: string) => {
+    const newRequest: PassengerRequest = {
+      id: `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      passengerId,
+      type: type as any,
+      description,
+      status: 'in-progress',
+      timestamp: Date.now(),
+      respondedBy: 'Crew Member',
+      respondedAt: Date.now(),
+      response: 'On my way'
+    }
+
+    setRequests((current) => [...(current || []), newRequest])
+    
+    toast.success(`Request acknowledged`, {
+      description: `"${description}" - Response sent to passenger`
+    })
+
+    setTimeout(() => {
+      setRequests((current) =>
+        (current || []).map((req) =>
+          req.id === newRequest.id
+            ? { ...req, status: 'completed' as RequestStatus, completedAt: Date.now() }
+            : req
+        )
+      )
+      toast.success('Request completed', {
+        description: `"${description}" has been fulfilled`
+      })
+    }, 5000)
+  }
+
+  const getPassengerRequests = (passengerId: string) => {
+    return (requests || []).filter(req => req.passengerId === passengerId)
+  }
+
+  const getRequestIcon = (type: string) => {
+    switch (type) {
+      case 'beverage':
+        return <Coffee className="w-4 h-4" weight="fill" />
+      case 'meal':
+        return <ForkKnife className="w-4 h-4" weight="fill" />
+      case 'blanket':
+        return <Bed className="w-4 h-4" weight="fill" />
+      case 'temperature':
+        return <Thermometer className="w-4 h-4" weight="fill" />
+      case 'entertainment':
+        return <Television className="w-4 h-4" weight="fill" />
+      case 'assistance':
+        return <HandHeart className="w-4 h-4" weight="fill" />
+      default:
+        return <ChatCircleText className="w-4 h-4" weight="fill" />
+    }
+  }
+
+  const getRequestStatusBadge = (status: RequestStatus) => {
+    switch (status) {
+      case 'completed':
+        return (
+          <Badge className="bg-success/10 text-success border-success/20">
+            <CheckCircle className="w-3 h-3 mr-1" weight="fill" />
+            Completed
+          </Badge>
+        )
+      case 'in-progress':
+        return (
+          <Badge className="bg-accent/10 text-accent border-accent/20">
+            <HourglassHigh className="w-3 h-3 mr-1" weight="fill" />
+            In Progress
+          </Badge>
+        )
+      case 'declined':
+        return (
+          <Badge className="bg-destructive/10 text-destructive border-destructive/20">
+            <Prohibit className="w-3 h-3 mr-1" weight="fill" />
+            Declined
+          </Badge>
+        )
+      default:
+        return (
+          <Badge variant="outline">
+            <Clock className="w-3 h-3 mr-1" weight="fill" />
+            Pending
+          </Badge>
+        )
+    }
+  }
+
+  const quickReplyOptions = [
+    { type: 'beverage', label: 'Water', description: 'Glass of water', icon: Coffee },
+    { type: 'beverage', label: 'Coffee', description: 'Cup of coffee', icon: Coffee },
+    { type: 'beverage', label: 'Tea', description: 'Cup of tea', icon: Coffee },
+    { type: 'meal', label: 'Snack', description: 'Light snack', icon: ForkKnife },
+    { type: 'blanket', label: 'Blanket', description: 'Extra blanket', icon: Bed },
+    { type: 'temperature', label: 'Too Cold', description: 'Passenger feels cold', icon: Thermometer },
+    { type: 'entertainment', label: 'IFE Help', description: 'Entertainment system assistance', icon: Television },
+    { type: 'assistance', label: 'Assistance', description: 'General assistance needed', icon: HandHeart },
+  ]
 
   return (
     <div className="p-6 space-y-6">
@@ -116,7 +220,7 @@ export default function PassengersView() {
       </div>
 
       <Dialog open={!!selectedPassenger} onOpenChange={() => setSelectedPassenger(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>{selectedPassenger?.name}</span>
@@ -128,11 +232,65 @@ export default function PassengersView() {
           </DialogHeader>
           
           {selectedPassenger && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div className="p-4 rounded-lg bg-muted/50">
                 <p className="text-sm font-medium text-muted-foreground">Seat Assignment</p>
                 <p className="mt-1 text-2xl font-mono font-semibold">{selectedPassenger.seatNumber}</p>
               </div>
+
+              <div>
+                <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Quick Reply Actions</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickReplyOptions.map((option, idx) => {
+                    const IconComponent = option.icon
+                    return (
+                      <Button
+                        key={idx}
+                        variant="outline"
+                        size="sm"
+                        className="justify-start h-auto py-3 transition-all hover:bg-accent/10 hover:border-accent hover:scale-[1.02]"
+                        onClick={() => handleQuickReply(selectedPassenger.id, option.type, option.description)}
+                      >
+                        <IconComponent className="w-4 h-4 mr-2" weight="fill" />
+                        <div className="text-left">
+                          <div className="font-medium">{option.label}</div>
+                          <div className="text-xs text-muted-foreground">{option.description}</div>
+                        </div>
+                      </Button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {getPassengerRequests(selectedPassenger.id).length > 0 && (
+                <div>
+                  <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Recent Requests</p>
+                  <div className="space-y-2">
+                    {getPassengerRequests(selectedPassenger.id)
+                      .sort((a, b) => b.timestamp - a.timestamp)
+                      .slice(0, 5)
+                      .map((request) => (
+                        <div key={request.id} className="p-3 border rounded-lg bg-card">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-2 flex-1 min-w-0">
+                              {getRequestIcon(request.type)}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">{request.description}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(request.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  {request.respondedBy && ` • Handled by ${request.respondedBy}`}
+                                </p>
+                              </div>
+                            </div>
+                            {getRequestStatusBadge(request.status)}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              <Separator />
 
               {selectedPassenger.specialNeeds && selectedPassenger.specialNeeds.length > 0 && (
                 <div>

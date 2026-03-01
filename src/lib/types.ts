@@ -33,6 +33,23 @@ export interface Passenger {
     meal?: string
   }
   purchaseHistory?: string[]
+  requests?: PassengerRequest[]
+}
+
+export type RequestStatus = 'pending' | 'in-progress' | 'completed' | 'declined'
+export type RequestType = 'beverage' | 'meal' | 'blanket' | 'assistance' | 'temperature' | 'entertainment' | 'other'
+
+export interface PassengerRequest {
+  id: string
+  passengerId: string
+  type: RequestType
+  description: string
+  status: RequestStatus
+  timestamp: number
+  respondedBy?: string
+  respondedAt?: number
+  response?: string
+  completedAt?: number
 }
 
 export interface InventoryItem {

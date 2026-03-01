@@ -16,6 +16,7 @@ import { useAlertMonitor } from '@/hooks/use-alert-monitor'
 import { useAutomatedAlerts } from '@/hooks/use-automated-alerts'
 import { useInventoryMonitor } from '@/hooks/use-inventory-monitor'
 import { useConsumptionTracker } from '@/hooks/use-consumption-tracker'
+import { useInitializeData } from '@/hooks/use-initialize-data'
 import type { SyncStatus, FlightInfo } from '@/lib/types'
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
     currentPhase: 'cruise'
   })
 
+  useInitializeData()
   useAlertMonitor()
   useAutomatedAlerts()
   useInventoryMonitor()
