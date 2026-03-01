@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -5,9 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Package, ForkKnife, Coffee, ShoppingCart, WarningCircle, TrendUp, Plus, Minus } from '@phosphor-icons/react'
 import type { InventoryItem } from '@/lib/types'
+import ConsumptionSimulatorControls from '@/components/ConsumptionSimulatorControls'
+import { useFlightConsumptionSimulator } from '@/hooks/use-flight-consumption-simulator'
 
 export default function InventoryView() {
   const [inventory, setInventory] = useKV<InventoryItem[]>('inventory', [])
+  const [simulationEnabled, setSimulationEnabled] = useState(false)
+  
+  useFlightConsumptionSimulator(simulationEnabled)
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -94,6 +100,11 @@ export default function InventoryView() {
           )}
         </div>
       </div>
+
+      <ConsumptionSimulatorControls 
+        simulationEnabled={simulationEnabled}
+        onToggleSimulation={setSimulationEnabled}
+      />
 
       {lowStockCount > 0 && (
         <Card className="border-warning/50 bg-warning/5">
