@@ -31,7 +31,8 @@ import {
   Gift,
   Books,
   MegaphoneSimple,
-  Storefront
+  Storefront,
+  DotsSixVertical
 } from '@phosphor-icons/react'
 import { useKV } from '@github/spark/hooks'
 import { toast } from 'sonner'
@@ -152,6 +153,8 @@ export default function ServicePhaseTracker() {
   const [phaseName, setPhaseName] = useState('')
   const [phaseDuration, setPhaseDuration] = useState('30')
   const [phaseIcon, setPhaseIcon] = useState<IconName>('Sparkle')
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
   const startPhase = (phaseId: string) => {
     setServicePhases(current => 
@@ -348,6 +351,38 @@ export default function ServicePhaseTracker() {
     }
   }
 
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index)
+  }
+
+  const handleDragEnter = (index: number) => {
+    if (draggedIndex === null || draggedIndex === index) return
+    setDragOverIndex(index)
+  }
+
+  const handleDragEnd = () => {
+    if (draggedIndex === null || dragOverIndex === null) {
+      setDraggedIndex(null)
+      setDragOverIndex(null)
+      return
+    }
+
+    setServicePhases(current => {
+      const phases = [...(current || [])]
+      const [draggedPhase] = phases.splice(draggedIndex, 1)
+      phases.splice(dragOverIndex, 0, draggedPhase)
+      return phases
+    })
+
+    setDraggedIndex(null)
+    setDragOverIndex(null)
+    toast.success('Service phase order updated')
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -430,19 +465,34 @@ export default function ServicePhaseTracker() {
       </CardHeader>
       <CardContent className="space-y-4 max-h-[600px] overflow-y-auto">
         {servicePhases && servicePhases.length > 0 ? (
-          servicePhases.map(phase => {
+          servicePhases.map((phase, index) => {
             const Icon = getPhaseIcon(phase.iconName)
             const progress = getPhaseProgress(phase)
             const time = getPhaseTime(phase)
             const isOvertime = phase.status === 'in-progress' && time > phase.estimatedDuration
+            const isDragging = draggedIndex === index
+            const isDragOver = dragOverIndex === index
 
             return (
               <div 
                 key={phase.id}
-                className="flex flex-col gap-3 p-4 rounded-lg border bg-card hover:shadow-sm transition-shadow"
+                draggable={true}
+                onDragStart={() => handleDragStart(index)}
+                onDragEnter={() => handleDragEnter(index)}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}
+                className={`flex flex-col gap-3 p-4 rounded-lg border bg-card transition-all ${
+                  isDragging ? 'opacity-50 cursor-grabbing' : 'cursor-grab hover:shadow-sm'
+                } ${isDragOver && !isDragging ? 'border-accent border-2 shadow-md' : ''}`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3 flex-1">
+                    <button 
+                      className="drag-handle cursor-grab active:cursor-grabbing touch-none"
+                      onMouseDown={(e) => e.stopPropagation()}
+                    >
+                      <DotsSixVertical className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" weight="bold" />
+                    </button>
                     <Icon className="w-5 h-5 text-muted-foreground" weight="fill" />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
