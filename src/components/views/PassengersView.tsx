@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { MagnifyingGlass, Airplane, ForkKnife, Coffee, Star, Clock } from '@phosphor-icons/react'
+import PassengerAssistanceAI from '@/components/PassengerAssistanceAI'
 import type { Passenger } from '@/lib/types'
 
 export default function PassengersView() {
@@ -46,6 +47,8 @@ export default function PassengersView() {
         <h2 className="text-2xl font-semibold tracking-tight text-foreground">Passengers</h2>
         <p className="text-sm text-muted-foreground">Passenger information and special services</p>
       </div>
+
+      <PassengerAssistanceAI />
 
       <div className="relative">
         <MagnifyingGlass className="absolute w-5 h-5 transform -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />

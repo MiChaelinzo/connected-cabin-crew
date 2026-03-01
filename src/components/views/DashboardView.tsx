@@ -5,6 +5,10 @@ import { Progress } from '@/components/ui/progress'
 import { WarningCircle, CheckCircle, Seat, FirstAid, Clock } from '@phosphor-icons/react'
 import AlertTestPanel from '@/components/AlertTestPanel'
 import SensorMonitor from '@/components/SensorMonitor'
+import QuickActions from '@/components/QuickActions'
+import ConnectionGuardian from '@/components/ConnectionGuardian'
+import ServicePhaseTracker from '@/components/ServicePhaseTracker'
+import TurnaroundChecklist from '@/components/TurnaroundChecklist'
 import type { CabinZone } from '@/lib/types'
 
 export default function DashboardView() {
@@ -91,6 +95,15 @@ export default function DashboardView() {
           </CardContent>
         </Card>
       </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <QuickActions />
+        <ConnectionGuardian />
+      </div>
+
+      <ServicePhaseTracker />
+
+      <TurnaroundChecklist />
 
       <div>
         <h3 className="mb-4 text-lg font-semibold">Cabin Zones</h3>
