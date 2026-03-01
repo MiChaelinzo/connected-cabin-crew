@@ -1,131 +1,130 @@
 import { useKV } from '@github/spark/hooks'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ShieldCheck } from '@phosphor-icons/react'
 import SecurityRobotMonitor from '@/components/SecurityRobotMonitor'
-import { Button } from '@/components/ui/button'
 import ThreatDashboard from '@/components/ThreatDashboard'
-import SecurityRobotMonitor from '@/components/SecurityRobotMonitor'
 import SecurityEventsList from '@/components/SecurityEventsList'
-    activeThreats: 0,
+import type { SecurityRobot, SecurityEvent, ThreatAssessment } from '@/lib/types'
 
+export default function SecurityView() {
+  const [activeTab, setActiveTab] = useState('overview')
+  const [isMonitoring, setIsMonitoring] = useState(true)
+  
+  const [threatAssessment, setThreatAssessment] = useKV<ThreatAssessment>('threat-assessment', {
+    overallThreatLevel: 'low',
+    activeThreats: 0,
+    containedThreats: 0,
+    falseAlarms: 0,
+    aiConfidence: 95,
     lastUpdated: Date.now(),
+    recommendations: []
   })
 
-    if (!robots || robots.length === 0) {
-        {
-          name: 'Sentinel Alph
-          status: 'pa
-          location: 'Fir
-          capabilit
-          coordinates
-        {
-          name: 'Sentin
-    
-          location: 'Business Class',
+  const [robots, setRobots] = useKV<SecurityRobot[]>('security-robots', [])
+  const [securityEvents, setSecurityEvents] = useKV<SecurityEvent[]>('security-events', [])
 
-          coordinat
-        {
-          name: 'Defender Gamma',
-         
-          location: 'Galley Ar
-          capabilities: ['Perimet
-          coordinates: { 
-      ]
-    }
-    if (!securityEvents || securityEvent
-        {
-          type: 'alert',
-          title: 'Unattended Baggage',
-          location: 'Row 23B',
-          
-        }
-      setSecurityEvents(initia
-  }, [robots, securityEvents, se
   useEffect(() => {
+    if (!robots || robots.length === 0) {
+      const initialRobots: SecurityRobot[] = [
+        {
+          id: 'robot-1',
+          name: 'Sentinel Alpha',
+          type: 'patrol',
+          status: 'patrolling',
+          battery: 85,
+          location: 'First Class',
+          capabilities: ['Surveillance', 'Thermal Scanning', 'Audio Detection'],
+          lastMaintenance: Date.now() - 86400000 * 3,
+          coordinates: { x: 10, y: 5, z: 1 },
+          assignedZone: 'Zone A'
+        },
+        {
+          id: 'robot-2',
+          name: 'Sentinel Beta',
+          type: 'security',
+          status: 'idle',
+          battery: 92,
+          location: 'Business Class',
+          capabilities: ['Threat Assessment', 'Crowd Control', 'Emergency Response'],
+          lastMaintenance: Date.now() - 86400000 * 5,
+          coordinates: { x: 30, y: 15, z: 1 },
+          assignedZone: 'Zone B'
+        },
+        {
+          id: 'robot-3',
+          name: 'Defender Gamma',
+          type: 'inspection',
+          status: 'charging',
+          battery: 45,
+          location: 'Galley Area',
+          capabilities: ['Perimeter Scan', 'Object Recognition', 'Chemical Detection'],
+          lastMaintenance: Date.now() - 86400000 * 2,
+          coordinates: { x: 50, y: 25, z: 1 },
+          assignedZone: 'Zone C'
+        }
+      ]
+      setRobots(initialRobots)
+    }
 
-      setThreatAssessm
+    if (!securityEvents || securityEvents.length === 0) {
+      const initialEvents: SecurityEvent[] = [
+        {
+          id: 'event-1',
+          type: 'suspicious-behavior',
+          threatLevel: 'low',
+          title: 'Unattended Baggage',
+          description: 'Carry-on bag left unattended for 5+ minutes',
+          location: 'Row 23B',
+          timestamp: Date.now() - 600000,
+          detectedBy: 'ai',
+          status: 'investigating',
+          assignedRobots: ['robot-1']
+        }
+      ]
+      setSecurityEvents(initialEvents)
+    }
+  }, [robots, securityEvents, setRobots, setSecurityEvents])
+
+  useEffect(() => {
+    if (isMonitoring) {
+      setThreatAssessment((current) => {
+        const defaultAssessment: ThreatAssessment = {
           overallThreatLevel: 'low',
+          activeThreats: 0,
           containedThreats: 0,
+          falseAlarms: 0,
           aiConfidence: 95,
-          recommendations: []
-        
-        co
-        c
-        let overallLevel: Thre
-        else if (active > 0) over
-
-          overallThreatLevel:
-          containedThr
-          aiConfidence: Math.min(9
+          recommendations: [],
           lastUpdated: Date.now()
-      })
-
-  }, [isMonitoring, setThreatAssessment])
-  const h
-      (
-      )
-  }
-
-      (current || []).map(robot =>
-      )
-  }
-  const handleDeployRobot = (r
-      (current || []).ma
-          ? { ...robot, st
-      )
-  }
-  const availableRobots = (rob
-  return (
-      <div className="flex items-c
-          <h2 className="text-2xl font-s
-        <
-       
-          className="gap-2"
-     
-        </Button>
-
-        <TabsList>
-          <TabsTrigger value=
-
-        <TabsContent value="overview" cl
-            assessment={threatAssessment
-              activeThreats: 0,
-              falseAlarms: 0,
-              lastUpdated: 
-            }}
-        </TabsContent>
-        <TabsContent value=
-            events={securityEvents
-            availableRobots={
-        <
+        }
         
-            robots={robots || []}
-            onDeployRobot={handleDeployRobot}
-        </TabsContent>
-    </div>
+        const currentAssessment = current || defaultAssessment
+        const events = securityEvents || []
+        const active = events.filter(e => e.status === 'active' || e.status === 'investigating').length
+        const contained = events.filter(e => e.status === 'contained').length
+        const falseAlarms = events.filter(e => e.status === 'false-alarm').length
 
+        let overallLevel: ThreatAssessment['overallThreatLevel'] = 'none'
+        if (active > 2) overallLevel = 'high'
+        else if (active > 0) overallLevel = 'low'
 
+        return {
+          ...currentAssessment,
+          overallThreatLevel: overallLevel,
+          activeThreats: active,
+          containedThreats: contained,
+          falseAlarms: falseAlarms,
+          aiConfidence: Math.min(95, currentAssessment.aiConfidence + Math.random() * 2 - 1),
+          lastUpdated: Date.now()
+        }
+      })
+    }
+  }, [isMonitoring, securityEvents, setThreatAssessment])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  const handleUpdateEvent = (eventId: string, updates: Partial<SecurityEvent>) => {
+    setSecurityEvents((current) =>
       (current || []).map(event =>
         event.id === eventId ? { ...event, ...updates } : event
       )
@@ -187,6 +186,9 @@ import SecurityEventsList from '@/components/SecurityEventsList'
               lastUpdated: Date.now(),
               recommendations: []
             }}
+            events={securityEvents || []}
+            robots={robots || []}
+            onDeployRobot={handleDeployRobot}
           />
         </TabsContent>
 
@@ -194,6 +196,7 @@ import SecurityEventsList from '@/components/SecurityEventsList'
           <SecurityEventsList
             events={securityEvents || []}
             onUpdateEvent={handleUpdateEvent}
+            onDeployRobot={handleDeployRobot}
             availableRobots={availableRobots}
           />
         </TabsContent>
