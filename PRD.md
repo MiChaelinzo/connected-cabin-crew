@@ -41,11 +41,11 @@ This platform addresses multiple interconnected operational domains—passenger 
 - **Success criteria**: 60% reduction in incident report completion time; 100% digital submission within 5 minutes of incident; elimination of lost/incomplete paper reports
 
 ### Crew Coordination Hub
-- **Functionality**: Real-time crew-to-crew messaging, task assignment, service phase coordination, and shift handover documentation
-- **Purpose**: Reduces miscommunication, distributes workload efficiently, and ensures seamless coordination across cabin zones and crew shifts
-- **Trigger**: Crew needs to communicate with colleagues, delegate task, or coordinate service timing
-- **Progression**: Crew opens coordination panel → Views team status and locations → Sends task assignment or message → Recipient receives notification → Completes task → Confirms completion → System logs activity
-- **Success criteria**: 50% reduction in missed task handoffs; improved Crew Effort Score through better workload distribution; faster turnaround through coordinated cabin prep
+- **Functionality**: Real-time crew-to-crew messaging, task assignment, service phase coordination with custom phase creation, and shift handover documentation; crew can create custom service phases with user-defined names, durations, and icons to match specific flight operations
+- **Purpose**: Reduces miscommunication, distributes workload efficiently, ensures seamless coordination across cabin zones and crew shifts, and allows flexibility to adapt service workflows to different routes, aircraft types, or special service requirements
+- **Trigger**: Crew needs to communicate with colleagues, delegate task, coordinate service timing, or create a custom service phase for a specific operational need
+- **Progression**: Crew opens coordination panel → Views team status and locations → Optionally creates custom service phase (clicks "Add Phase" → Enters phase name, duration, selects icon → Saves) → Sends task assignment or message → Recipient receives notification → Completes task → Confirms completion → System logs activity; Custom phases persist and can be edited or deleted when in pending state
+- **Success criteria**: 50% reduction in missed task handoffs; improved Crew Effort Score through better workload distribution; faster turnaround through coordinated cabin prep; crew can create and manage unlimited custom service phases tailored to operational needs; 90% of crews find custom phases useful for specialized services
 
 ### Offline-First Sync Engine
 - **Functionality**: All core features function without connectivity; data queues locally and syncs automatically when connection restored
