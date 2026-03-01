@@ -110,22 +110,58 @@ export default function AlertCenter() {
         <Button
           variant="ghost"
           size="icon"
-          className={`relative ${hasCritical ? 'animate-pulse' : ''}`}
+          className="relative"
         >
-          {hasCritical ? (
-            <BellRinging className="w-6 h-6 text-critical" weight="fill" />
-          ) : hasUnacknowledged ? (
-            <BellRinging className="w-6 h-6" weight="fill" />
-          ) : (
-            <Bell className="w-6 h-6" weight="fill" />
-          )}
+          <motion.div
+            animate={hasCritical ? {
+              filter: [
+                'drop-shadow(0 0 2px rgb(239 68 68 / 0.4))',
+                'drop-shadow(0 0 8px rgb(239 68 68 / 0.6)) drop-shadow(0 0 12px rgb(239 68 68 / 0.4))',
+                'drop-shadow(0 0 2px rgb(239 68 68 / 0.4))',
+              ]
+            } : hasUnacknowledged ? {
+              filter: [
+                'drop-shadow(0 0 2px rgb(34 197 94 / 0.3))',
+                'drop-shadow(0 0 6px rgb(34 197 94 / 0.5))',
+                'drop-shadow(0 0 2px rgb(34 197 94 / 0.3))',
+              ]
+            } : {}}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            {hasCritical ? (
+              <BellRinging className="w-6 h-6 text-critical" weight="fill" />
+            ) : hasUnacknowledged ? (
+              <BellRinging className="w-6 h-6" weight="fill" />
+            ) : (
+              <Bell className="w-6 h-6" weight="fill" />
+            )}
+          </motion.div>
           
           <AnimatePresence>
             {hasUnacknowledged && (
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                animate={{ 
+                  scale: 1,
+                  boxShadow: hasCritical ? [
+                    '0 0 0px rgba(239, 68, 68, 0.4)',
+                    '0 0 12px rgba(239, 68, 68, 0.6)',
+                    '0 0 0px rgba(239, 68, 68, 0.4)',
+                  ] : [
+                    '0 0 0px rgba(34, 197, 94, 0.3)',
+                    '0 0 8px rgba(34, 197, 94, 0.5)',
+                    '0 0 0px rgba(34, 197, 94, 0.3)',
+                  ]
+                }}
                 exit={{ scale: 0 }}
+                transition={{
+                  scale: { duration: 0.2 },
+                  boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                }}
                 className={`absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-semibold rounded-full ${hasCritical ? 'bg-critical' : 'bg-accent'} text-white`}
               >
                 {unacknowledgedAlerts.length > 9 ? '9+' : unacknowledgedAlerts.length}
@@ -183,8 +219,29 @@ export default function AlertCenter() {
                   <motion.div
                     key={alert.id}
                     initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    animate={{ 
+                      opacity: 1, 
+                      x: 0,
+                      filter: !alert.acknowledged && alert.priority === 'critical' ? [
+                        'drop-shadow(0 0 0px rgba(239, 68, 68, 0.3))',
+                        'drop-shadow(0 0 8px rgba(239, 68, 68, 0.5)) drop-shadow(0 0 16px rgba(239, 68, 68, 0.3))',
+                        'drop-shadow(0 0 0px rgba(239, 68, 68, 0.3))',
+                      ] : !alert.acknowledged && alert.priority === 'high' ? [
+                        'drop-shadow(0 0 0px rgba(249, 115, 22, 0.3))',
+                        'drop-shadow(0 0 6px rgba(249, 115, 22, 0.4)) drop-shadow(0 0 12px rgba(249, 115, 22, 0.2))',
+                        'drop-shadow(0 0 0px rgba(249, 115, 22, 0.3))',
+                      ] : !alert.acknowledged && alert.priority === 'medium' ? [
+                        'drop-shadow(0 0 0px rgba(234, 179, 8, 0.3))',
+                        'drop-shadow(0 0 4px rgba(234, 179, 8, 0.4)) drop-shadow(0 0 8px rgba(234, 179, 8, 0.2))',
+                        'drop-shadow(0 0 0px rgba(234, 179, 8, 0.3))',
+                      ] : 'drop-shadow(0 0 0px transparent)'
+                    }}
                     exit={{ opacity: 0, x: 20 }}
+                    transition={{
+                      opacity: { duration: 0.2 },
+                      x: { duration: 0.2 },
+                      filter: { duration: 2, repeat: !alert.acknowledged ? Infinity : 0, ease: "easeInOut" }
+                    }}
                   >
                     <Card className={`relative ${!alert.acknowledged ? 'border-l-4' : ''} ${alert.priority === 'critical' ? 'border-l-critical' : alert.priority === 'high' ? 'border-l-destructive' : alert.priority === 'medium' ? 'border-l-warning' : ''}`}>
                       <CardHeader className="pb-2">
