@@ -54,6 +54,13 @@ This platform addresses multiple interconnected operational domains—passenger 
 - **Progression**: Connectivity lost → Visual indicator shows offline mode → Crew continues using all features → Data queues locally → Connection restores → Auto-sync begins → Confirmation shown
 - **Success criteria**: Zero loss of functionality during offline periods; 100% data integrity after sync; sync completion within 30 seconds of reconnection
 
+### Real-Time Alert System
+- **Functionality**: Priority-based notification system for critical cabin events with customizable sound alerts and visual indicators
+- **Purpose**: Ensures immediate crew awareness of safety issues, medical emergencies, equipment failures, and passenger needs requiring urgent attention
+- **Trigger**: Critical event occurs in cabin (smoke detected, medical emergency, equipment malfunction, passenger incident)
+- **Progression**: Event detected → Alert generated with priority level → Sound notification plays → Visual badge appears on bell icon → Toast notification displays → Crew opens alert center → Reviews details and action requirements → Acknowledges alert → Takes appropriate action
+- **Success criteria**: 100% alert delivery within 2 seconds of event; distinct sound patterns for different priority levels; zero missed critical alerts; crew can acknowledge/dismiss alerts; historical alert log maintained
+
 ## Edge Case Handling
 
 - **Emergency Situations** - Critical safety alerts override all other notifications with distinct visual/audio signals; emergency protocols accessible within two taps

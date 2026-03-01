@@ -95,3 +95,24 @@ export interface SyncStatus {
   lastSync: number
   pendingChanges: number
 }
+
+export type AlertPriority = 'low' | 'medium' | 'high' | 'critical'
+export type AlertCategory = 'safety' | 'medical' | 'equipment' | 'passenger' | 'service' | 'system'
+
+export interface CabinAlert {
+  id: string
+  category: AlertCategory
+  priority: AlertPriority
+  title: string
+  message: string
+  location?: string
+  timestamp: number
+  acknowledged: boolean
+  acknowledgedBy?: string
+  acknowledgedAt?: number
+  resolved: boolean
+  resolvedBy?: string
+  resolvedAt?: number
+  actionRequired?: string
+  relatedData?: any
+}

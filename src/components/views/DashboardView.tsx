@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { WarningCircle, CheckCircle, Seat, FirstAid, Clock } from '@phosphor-icons/react'
+import AlertTestPanel from '@/components/AlertTestPanel'
 import type { CabinZone } from '@/lib/types'
 
 export default function DashboardView() {
@@ -141,6 +142,8 @@ export default function DashboardView() {
           )}
         </div>
       </div>
+
+      <AlertTestPanel />
     </div>
   )
 }

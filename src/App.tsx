@@ -8,6 +8,8 @@ import PassengersView from '@/components/views/PassengersView'
 import InventoryView from '@/components/views/InventoryView'
 import ReportsView from '@/components/views/ReportsView'
 import CrewView from '@/components/views/CrewView'
+import AlertCenter from '@/components/AlertCenter'
+import { useAlertMonitor } from '@/hooks/use-alert-monitor'
 import type { SyncStatus, FlightInfo } from '@/lib/types'
 
 function App() {
@@ -25,6 +27,8 @@ function App() {
     arrivalTime: '20:45',
     currentPhase: 'cruise'
   })
+
+  useAlertMonitor()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -125,14 +129,17 @@ function App() {
             </div>
           </div>
 
-          <button
-            onClick={handleManualSync}
-            disabled={syncStatus?.connectivity === 'syncing'}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {getConnectivityIcon()}
-            <span className="hidden sm:inline">{getConnectivityText()}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <AlertCenter />
+            <button
+              onClick={handleManualSync}
+              disabled={syncStatus?.connectivity === 'syncing'}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {getConnectivityIcon()}
+              <span className="hidden sm:inline">{getConnectivityText()}</span>
+            </button>
+          </div>
         </div>
       </header>
 
