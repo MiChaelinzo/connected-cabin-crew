@@ -1,7 +1,7 @@
 import { useKV } from '@github/spark/hooks'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Bell, FirstAid, Warning, Wrench, User, ShoppingBag } from '@phosphor-icons/react'
+import { Bell, FirstAid, Warning, Wrench, User, ShoppingBag, Package } from '@phosphor-icons/react'
 import { sampleAlerts } from '@/lib/alert-utils'
 import type { CabinAlert } from '@/lib/types'
 
@@ -63,6 +63,24 @@ export default function AlertTestPanel() {
           >
             <User className="w-4 h-4 mr-2 text-destructive" weight="fill" />
             Passenger Issue
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => triggerAlert(sampleAlerts.highInventory)}
+            className="justify-start"
+          >
+            <Package className="w-4 h-4 mr-2 text-destructive" weight="fill" />
+            Out of Stock
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => triggerAlert(sampleAlerts.mediumInventory)}
+            className="justify-start"
+          >
+            <Package className="w-4 h-4 mr-2 text-warning" weight="fill" />
+            Low Inventory
           </Button>
 
           <Button

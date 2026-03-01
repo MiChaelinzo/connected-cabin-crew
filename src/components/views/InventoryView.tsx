@@ -1,12 +1,13 @@
 import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { Package, ForkKnife, Coffee, ShoppingCart, WarningCircle, TrendUp } from '@phosphor-icons/react'
+import { Package, ForkKnife, Coffee, ShoppingCart, WarningCircle, TrendUp, Plus, Minus } from '@phosphor-icons/react'
 import type { InventoryItem } from '@/lib/types'
 
 export default function InventoryView() {
-  const [inventory] = useKV<InventoryItem[]>('inventory', [])
+  const [inventory, setInventory] = useKV<InventoryItem[]>('inventory', [])
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -48,11 +49,50 @@ export default function InventoryView() {
   const categories = Object.keys(groupedInventory)
   const lowStockCount = inventory?.filter(item => getStockStatus(item) === 'critical').length || 0
 
+  const adjustStock = (itemId: string, amount: number) => {
+    setInventory((current) => {
+      const items = current || []
+      return items.map(item => {
+        if (item.id === itemId) {
+          const newCurrent = Math.max(0, Math.min(item.capacity, item.current + amount))
+          return { ...item, current: newCurrent }
+        }
+        return item
+      })
+    })
+  }
+
+  const initializeSampleInventory = () => {
+    const sampleItems: InventoryItem[] = [
+      { id: 'meal-chicken', category: 'meals', name: 'Chicken Meal', current: 45, capacity: 60, unit: 'units', alertThreshold: 15, predicted: 52 },
+      { id: 'meal-vegetarian', category: 'meals', name: 'Vegetarian Meal', current: 18, capacity: 25, unit: 'units', alertThreshold: 15, predicted: 22 },
+      { id: 'meal-fish', category: 'meals', name: 'Fish Meal', current: 22, capacity: 30, unit: 'units', alertThreshold: 15, predicted: 28 },
+      { id: 'bev-water', category: 'beverages', name: 'Bottled Water', current: 85, capacity: 120, unit: 'bottles', alertThreshold: 20, predicted: 110 },
+      { id: 'bev-juice-orange', category: 'beverages', name: 'Orange Juice', current: 8, capacity: 60, unit: 'cans', alertThreshold: 15, predicted: 45 },
+      { id: 'bev-coffee', category: 'beverages', name: 'Coffee', current: 42, capacity: 50, unit: 'servings', alertThreshold: 15, predicted: 48 },
+      { id: 'bev-tea', category: 'beverages', name: 'Tea', current: 35, capacity: 40, unit: 'bags', alertThreshold: 15, predicted: 38 },
+      { id: 'duty-perfume', category: 'duty-free', name: 'Perfume Set', current: 8, capacity: 12, unit: 'items', alertThreshold: 20, predicted: 10 },
+      { id: 'duty-chocolate', category: 'duty-free', name: 'Chocolate Box', current: 15, capacity: 20, unit: 'items', alertThreshold: 20, predicted: 18 },
+      { id: 'supply-blankets', category: 'supplies', name: 'Blankets', current: 55, capacity: 80, unit: 'items', alertThreshold: 25, predicted: 70 },
+      { id: 'supply-pillows', category: 'supplies', name: 'Pillows', current: 48, capacity: 60, unit: 'items', alertThreshold: 25, predicted: 55 },
+    ]
+    setInventory(sampleItems)
+  }
+
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Inventory Management</h2>
-        <p className="text-sm text-muted-foreground">Real-time stock levels and consumption tracking</p>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground">Inventory Management</h2>
+            <p className="text-sm text-muted-foreground">Real-time stock levels and consumption tracking</p>
+          </div>
+          {(!inventory || inventory.length === 0) && (
+            <Button onClick={initializeSampleInventory}>
+              Load Sample Data
+            </Button>
+          )}
+        </div>
       </div>
 
       {lowStockCount > 0 && (
@@ -93,18 +133,54 @@ export default function InventoryView() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <div className="flex items-baseline justify-between">
-                        <span className={`text-2xl font-semibold ${getStockColor(status)}`}>
-                          {item.current}
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          of {item.capacity} {item.unit}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Occupancy</span>
+                        <span className="font-medium">
+                          {item.current}/{item.capacity}
                         </span>
                       </div>
                       <Progress 
                         value={percentage} 
                         className="h-2"
                       />
+                      <div className="flex items-center gap-2 pt-2 border-t">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => adjustStock(item.id, -1)}
+                          disabled={item.current === 0}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => adjustStock(item.id, -5)}
+                          disabled={item.current < 5}
+                          className="h-8 flex-1 text-xs"
+                        >
+                          -5
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => adjustStock(item.id, 5)}
+                          disabled={item.current >= item.capacity}
+                          className="h-8 flex-1 text-xs"
+                        >
+                          +5
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => adjustStock(item.id, 1)}
+                          disabled={item.current >= item.capacity}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </Button>
+                      </div>
                       {item.predicted !== undefined && (
                         <div className="flex items-center gap-2 pt-2 text-sm border-t">
                           <TrendUp className="w-4 h-4 text-accent" />

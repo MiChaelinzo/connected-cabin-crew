@@ -27,11 +27,11 @@ This platform addresses multiple interconnected operational domains—passenger 
 - **Success criteria**: 70% increase in proactive passenger assistance; measurable improvement in passenger NPS scores; reduction in missed special service requests
 
 ### Smart Inventory Management
-- **Functionality**: Tracks real-time inventory of meals, beverages, duty-free items, and service supplies with predictive consumption analytics
-- **Purpose**: Eliminates manual counting, prevents stockouts, optimizes loading for future flights, and maximizes ancillary revenue opportunities
-- **Trigger**: Auto-syncs at flight start; updates as items are consumed/sold; alerts crew on low stock
-- **Progression**: Crew views inventory dashboard → Sees predictive alerts for high-demand items → Adjusts service strategy → Sells/serves items → System auto-decrements → Generates restocking report for ground crew
-- **Success criteria**: 95% inventory accuracy without manual counting; 15% reduction in unused perishables; 10% increase in duty-free sales through targeted recommendations
+- **Functionality**: Tracks real-time inventory of meals, beverages, duty-free items, and service supplies with predictive consumption analytics; automatically monitors inventory levels and generates alerts when supplies run low
+- **Purpose**: Eliminates manual counting, prevents stockouts through proactive low-inventory alerts, optimizes loading for future flights, and maximizes ancillary revenue opportunities
+- **Trigger**: Auto-syncs at flight start; updates as items are consumed/sold; automatically generates alerts when inventory falls below configurable thresholds; crew can manually adjust quantities
+- **Progression**: Crew views inventory dashboard → System continuously monitors stock levels → Automatic alert generated when item crosses threshold (e.g., 15% remaining) → Alert displays in notification center with sound → Crew acknowledges alert → Adjusts service strategy → Sells/serves items → System auto-decrements → Critical alert generated if item fully depleted → Generates restocking report for ground crew
+- **Success criteria**: 95% inventory accuracy without manual counting; 15% reduction in unused perishables; 10% increase in duty-free sales through targeted recommendations; 100% of low-stock situations detected before depletion; crew notified of inventory issues within 2 seconds of threshold breach
 
 ### Incident & Safety Reporting
 - **Functionality**: Digital incident logging with photo capture, structured data fields, automatic timestamp/location tagging, and priority escalation
@@ -62,11 +62,11 @@ This platform addresses multiple interconnected operational domains—passenger 
 - **Success criteria**: 100% alert delivery within 2 seconds of event; distinct sound patterns for different priority levels; zero missed critical alerts; automated generation from sensor data with <1% false positive rate; crew can acknowledge/dismiss alerts; historical alert log maintained; sensor-to-alert latency under 3 seconds
 
 ### Automated Alert Generation
-- **Functionality**: Intelligent alert system that continuously monitors cabin sensor data (temperature, smoke, pressure, oxygen, galley equipment, IFE systems, doors) and passenger events (call buttons, medical alerts, seatbelt violations) to automatically generate contextual alerts
-- **Purpose**: Reduces crew cognitive load by eliminating manual observation requirements; enables proactive issue detection before problems escalate; ensures consistent monitoring across all cabin systems
-- **Trigger**: Continuous background monitoring checks sensor readings every 10 seconds; passenger event handlers fire on button press/system event
-- **Progression**: Sensor reading exceeds threshold OR Passenger event occurs → Alert generation engine evaluates conditions → Alert created with category (safety/medical/equipment/passenger/service), priority (critical/high/medium/low), location, and recommended actions → Alert dispatched to notification system → Crew receives alert via sound + visual + toast → Crew responds
-- **Success criteria**: All sensor anomalies generate alerts within 3 seconds; passenger events trigger alerts within 1 second; alert messages include specific location and actionable guidance; 95%+ crew satisfaction with alert relevance and timing; measurable reduction in incident discovery time
+- **Functionality**: Intelligent alert system that continuously monitors cabin sensor data (temperature, smoke, pressure, oxygen, galley equipment, IFE systems, doors), passenger events (call buttons, medical alerts, seatbelt violations), and inventory levels to automatically generate contextual alerts
+- **Purpose**: Reduces crew cognitive load by eliminating manual observation requirements; enables proactive issue detection before problems escalate; ensures consistent monitoring across all cabin systems and supply levels
+- **Trigger**: Continuous background monitoring checks sensor readings every 10 seconds; passenger event handlers fire on button press/system event; inventory monitor evaluates stock levels on every quantity change
+- **Progression**: Sensor reading exceeds threshold OR Passenger event occurs OR Inventory crosses threshold → Alert generation engine evaluates conditions → Alert created with category (safety/medical/equipment/passenger/service), priority (critical/high/medium/low), location, and recommended actions → Alert dispatched to notification system → Crew receives alert via sound + visual + toast → Crew responds
+- **Success criteria**: All sensor anomalies generate alerts within 3 seconds; passenger events trigger alerts within 1 second; inventory alerts trigger immediately upon threshold breach; alert messages include specific location and actionable guidance; 95%+ crew satisfaction with alert relevance and timing; measurable reduction in incident discovery time
 
 ## Edge Case Handling
 

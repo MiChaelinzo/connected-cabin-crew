@@ -11,6 +11,7 @@ import CrewView from '@/components/views/CrewView'
 import AlertCenter from '@/components/AlertCenter'
 import { useAlertMonitor } from '@/hooks/use-alert-monitor'
 import { useAutomatedAlerts } from '@/hooks/use-automated-alerts'
+import { useInventoryMonitor } from '@/hooks/use-inventory-monitor'
 import type { SyncStatus, FlightInfo } from '@/lib/types'
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
 
   useAlertMonitor()
   useAutomatedAlerts()
+  useInventoryMonitor()
 
   useEffect(() => {
     const interval = setInterval(() => {

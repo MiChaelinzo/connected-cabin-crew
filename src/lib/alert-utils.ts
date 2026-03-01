@@ -93,4 +93,22 @@ export const sampleAlerts = {
     'Seat 12A - Business',
     'Monitor gate information and assist with priority deplaning if possible.'
   ),
+
+  highInventory: () => createAlert(
+    'service',
+    'high',
+    'Item Out of Stock',
+    'Chicken meal option is completely depleted. Unable to fulfill remaining requests.',
+    'Galley',
+    'Inform crew to offer alternatives. Update replenishment list for next service.'
+  ),
+
+  mediumInventory: () => createAlert(
+    'service',
+    'medium',
+    'Low Inventory Alert',
+    'Orange juice is running low. Only 8 units remaining (13% capacity).',
+    'Galley',
+    'Adjust service strategy. Note for replenishment at next station.'
+  ),
 }
