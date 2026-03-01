@@ -46,9 +46,27 @@ function App() {
           pendingChanges: 0
         }
         const currentStatus = current || defaultStatus
+        
+        if (currentStatus.connectivity === 'syncing') {
+          return currentStatus
+        }
+        
+        if (currentStatus.connectivity === 'offline') {
+          const offlineDuration = Date.now() - (currentStatus.lastSync || Date.now())
+          if (offlineDuration > 10000 && Math.random() > 0.3) {
+            return {
+              ...currentStatus,
+              connectivity: 'online',
+              lastSync: Date.now(),
+              pendingChanges: 0
+            }
+          }
+          return currentStatus
+        }
+        
         return {
           ...currentStatus,
-          connectivity: Math.random() > 0.95 ? 'offline' : currentStatus.connectivity === 'syncing' ? 'online' : currentStatus.connectivity,
+          connectivity: Math.random() > 0.98 ? 'offline' : 'online',
           lastSync: currentStatus.connectivity === 'online' ? Date.now() : currentStatus.lastSync
         }
       })
@@ -152,8 +170,15 @@ function App() {
 
       {syncStatus?.connectivity === 'offline' && (
         <div className="sticky top-[73px] z-40 bg-warning/10 border-b border-warning/20">
-          <div className="px-6 py-3 text-sm font-medium text-center text-warning">
-            You are currently offline. Changes will sync automatically when connection is restored.
+          <div className="flex items-center justify-center gap-3 px-6 py-3 text-sm font-medium text-warning">
+            <span>You are currently offline. Changes will sync automatically when connection is restored.</span>
+            <button
+              onClick={handleManualSync}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors rounded bg-warning/20 hover:bg-warning/30"
+            >
+              <CloudArrowUp className="w-4 h-4" weight="bold" />
+              Retry
+            </button>
           </div>
         </div>
       )}
