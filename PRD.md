@@ -68,12 +68,12 @@ This platform addresses multiple interconnected operational domains—passenger 
 - **Progression**: Sensor reading exceeds threshold OR Passenger event occurs OR Inventory crosses threshold → Alert generation engine evaluates conditions → Alert created with category (safety/medical/equipment/passenger/service), priority (critical/high/medium/low), location, and recommended actions → Alert dispatched to notification system → Crew receives alert via sound + visual + toast → Crew responds
 - **Success criteria**: All sensor anomalies generate alerts within 3 seconds; passenger events trigger alerts within 1 second; inventory alerts trigger immediately upon threshold breach; alert messages include specific location and actionable guidance; 95%+ crew satisfaction with alert relevance and timing; measurable reduction in incident discovery time
 
-### Visual Consumption Analytics
-- **Functionality**: Comprehensive analytics dashboard with real-time tracking of inventory consumption patterns, trend visualization, category breakdowns, flight phase analysis, and AI-powered predictive insights; automatically tracks all inventory changes and builds historical consumption data for analysis
-- **Purpose**: Enables data-driven inventory optimization, identifies consumption patterns across flight phases, predicts stock depletion, surfaces surplus inventory, and provides actionable recommendations for future flight planning; helps optimize aircraft loading and reduce waste
-- **Trigger**: Automatically runs in background tracking all inventory changes; crew accesses analytics dashboard via dedicated tab; consumption data persists between sessions
-- **Progression**: Crew opens Analytics tab → Views summary statistics (total consumed, active categories, items tracked, current phase) → Explores trend charts showing cumulative consumption over time → Reviews category distribution via pie charts and top consumed items → Analyzes consumption patterns by flight phase with bar charts and breakdowns → Reviews AI-generated predictive insights (depletion warnings, surplus alerts, optimization suggestions) with severity indicators → Crew uses insights to adjust service strategy or plan future flights
-- **Success criteria**: 100% of inventory changes tracked automatically; consumption data visualized within 1 second of tab access; trend analysis available for all consumed items; predictive insights accuracy >85%; crew can identify consumption patterns and optimize loading decisions; measurable reduction in inventory waste and stockouts on future flights
+### Visual Consumption Analytics & Reporting
+- **Functionality**: Comprehensive analytics dashboard with real-time tracking of inventory consumption patterns, trend visualization, category breakdowns, flight phase analysis, and AI-powered predictive insights; automatically tracks all inventory changes and builds historical consumption data for analysis; includes professional export functionality to download detailed consumption reports in CSV or PDF format for post-flight analysis, regulatory compliance, and operational planning
+- **Purpose**: Enables data-driven inventory optimization, identifies consumption patterns across flight phases, predicts stock depletion, surfaces surplus inventory, and provides actionable recommendations for future flight planning; helps optimize aircraft loading and reduce waste; exportable reports enable offline analysis, regulatory documentation, and cross-departmental sharing with ground operations and supply chain teams
+- **Trigger**: Automatically runs in background tracking all inventory changes; crew accesses analytics dashboard via dedicated tab; consumption data persists between sessions; export buttons available when consumption data exists
+- **Progression**: Crew opens Analytics tab → Views summary statistics (total consumed, active categories, items tracked, current phase) → Explores trend charts showing cumulative consumption over time → Reviews category distribution via pie charts and top consumed items → Analyzes consumption patterns by flight phase with bar charts and breakdowns → Reviews AI-generated predictive insights (depletion warnings, surplus alerts, optimization suggestions) with severity indicators → Optionally exports comprehensive report: clicks "Export CSV" for spreadsheet analysis OR "Export PDF" for formatted report with print capability → Report includes flight info, all analytics data, trends, insights, and generation timestamp → Downloaded file auto-named with flight number and date → Crew uses insights to adjust service strategy or plan future flights
+- **Success criteria**: 100% of inventory changes tracked automatically; consumption data visualized within 1 second of tab access; trend analysis available for all consumed items; predictive insights accuracy >85%; crew can identify consumption patterns and optimize loading decisions; measurable reduction in inventory waste and stockouts on future flights; CSV export completes within 2 seconds; PDF export generates and opens print dialog within 3 seconds; exported reports include all relevant consumption data in structured, analyzable format; 90% of crew find exported reports useful for post-flight debriefs
 
 ## Edge Case Handling
 
@@ -135,9 +135,9 @@ Animations should reinforce system responsiveness and state changes without dela
   - Status Display: Card components with Badge overlays for cabin zone status; Alert components for notifications
   - Data Entry: Form components with Input, Select, Textarea, and Checkbox for incident reporting and logging
   - Passenger Search: Command component for quick passenger lookup; Dialog for detailed passenger profiles
-  - Actions: Button components with clear hierarchy (primary for safety-critical, secondary for routine actions, ghost for tertiary)
+  - Actions: Button components with clear hierarchy (primary for safety-critical, secondary for routine actions, ghost for tertiary); export buttons with distinct icons (FileCsv, FilePdf) for report downloads
   - Lists: Table component for inventory; custom Card-based lists for passengers and incidents
-  - Feedback: Toast notifications (via Sonner) for confirmations; Progress bars for sync status
+  - Feedback: Toast notifications (via Sonner) for confirmations and export status; Progress bars for sync status
   - Media: Avatar for crew and passenger profiles; inline image upload for incident photos
   - Charts: Recharts library for consumption analytics (LineChart for trends, BarChart for phase analysis, PieChart for category distribution)
 
@@ -157,7 +157,7 @@ Animations should reinforce system responsiveness and state changes without dela
 - **Icon Selection**: 
   - Phosphor icons throughout for consistency
   - Navigation: House (Dashboard), Users (Passengers), Package (Inventory), Warning (Reports), UsersFour (Crew), ChartBar (Analytics)
-  - Actions: Plus (Add), MagnifyingGlass (Search), PaperPlaneRight (Send), CheckCircle (Complete), X (Close/Cancel)
+  - Actions: Plus (Add), MagnifyingGlass (Search), PaperPlaneRight (Send), CheckCircle (Complete), X (Close/Cancel), FileCsv (CSV Export), FilePdf (PDF Export), DownloadSimple (Download)
   - Status: WifiHigh/WifiSlash (Connectivity), CloudArrowUp (Syncing), WarningCircle (Alert), CheckCircle (Success)
   - Cabin: Seat, FirstAid, ForkKnife, ShoppingCart, Bell
   - Analytics: TrendUp (Trends), Lightbulb (Insights), Clock (Phases), ChartBarHorizontal (Charts)

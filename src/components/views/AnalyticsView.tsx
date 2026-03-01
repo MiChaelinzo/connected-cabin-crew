@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { 
   ChartBarHorizontal, 
@@ -12,8 +13,12 @@ import {
   ForkKnife,
   Coffee,
   ShoppingCart,
-  Warning
+  Warning,
+  DownloadSimple,
+  FileCsv,
+  FilePdf
 } from '@phosphor-icons/react'
+import { toast } from 'sonner'
 import type { InventoryItem, FlightInfo } from '@/lib/types'
 import type { ConsumptionDataPoint } from '@/lib/consumption-analytics'
 import {
@@ -23,6 +28,7 @@ import {
   generatePredictiveInsights,
   formatRate
 } from '@/lib/consumption-analytics'
+import { exportToCSV, exportToPDF, type ConsumptionReportData } from '@/lib/export-utils'
 import { 
   LineChart, 
   Line, 
@@ -66,6 +72,7 @@ export default function AnalyticsView() {
     arrivalTime: '20:45',
     currentPhase: 'cruise'
   })
+  const [isExporting, setIsExporting] = useState(false)
 
   const trends = useMemo(() => {
     if (!consumptionData || !inventory) return []
@@ -141,11 +148,109 @@ export default function AnalyticsView() {
 
   const hasData = consumptionData && consumptionData.length > 0
 
+  const handleExportCSV = () => {
+    if (!hasData) {
+      toast.error('No data available to export')
+      return
+    }
+
+    try {
+      setIsExporting(true)
+      const reportData: ConsumptionReportData = {
+        flightInfo: flightInfo || {
+          flightNumber: 'AB1234',
+          departure: 'SIN',
+          arrival: 'LHR',
+          departureTime: '14:30',
+          arrivalTime: '20:45',
+          currentPhase: 'cruise'
+        },
+        generatedAt: Date.now(),
+        consumptionData: consumptionData || [],
+        trends,
+        categoryAnalytics,
+        phaseAnalytics,
+        insights,
+        inventory: inventory || []
+      }
+      
+      exportToCSV(reportData)
+      toast.success('CSV report downloaded successfully')
+    } catch (error) {
+      toast.error('Failed to export CSV report')
+      console.error('Export error:', error)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleExportPDF = async () => {
+    if (!hasData) {
+      toast.error('No data available to export')
+      return
+    }
+
+    try {
+      setIsExporting(true)
+      const reportData: ConsumptionReportData = {
+        flightInfo: flightInfo || {
+          flightNumber: 'AB1234',
+          departure: 'SIN',
+          arrival: 'LHR',
+          departureTime: '14:30',
+          arrivalTime: '20:45',
+          currentPhase: 'cruise'
+        },
+        generatedAt: Date.now(),
+        consumptionData: consumptionData || [],
+        trends,
+        categoryAnalytics,
+        phaseAnalytics,
+        insights,
+        inventory: inventory || []
+      }
+      
+      await exportToPDF(reportData)
+      toast.success('PDF report opened for printing')
+    } catch (error) {
+      toast.error('Failed to export PDF report')
+      console.error('Export error:', error)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Consumption Analytics</h2>
-        <p className="text-sm text-muted-foreground">Track usage patterns and optimize inventory</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground">Consumption Analytics</h2>
+          <p className="text-sm text-muted-foreground">Track usage patterns and optimize inventory</p>
+        </div>
+        {hasData && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportCSV}
+              disabled={isExporting}
+              className="flex items-center gap-2"
+            >
+              <FileCsv className="w-4 h-4" weight="fill" />
+              <span className="hidden sm:inline">Export CSV</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportPDF}
+              disabled={isExporting}
+              className="flex items-center gap-2"
+            >
+              <FilePdf className="w-4 h-4" weight="fill" />
+              <span className="hidden sm:inline">Export PDF</span>
+            </Button>
+          </div>
+        )}
       </div>
 
       {!hasData ? (
