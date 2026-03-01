@@ -286,7 +286,7 @@ export default function AIChatbot() {
         promptContent = `${promptContent}\n\nAttachments: ${attachmentDescriptions}`
       }
 
-      const prompt = window.spark.llmPrompt`You are an AI assistant specialized in cabin crew operations for airlines. You help with:
+      const prompt = (window.spark.llmPrompt as any)`You are an AI assistant specialized in cabin crew operations for airlines. You help with:
 - Reading and analyzing documents (tickets, reports, safety logs, incident reports)
 - Processing images (cabin photos, equipment issues, passenger documentation)
 - Understanding videos (training materials, incident footage, cabin walkthroughs)

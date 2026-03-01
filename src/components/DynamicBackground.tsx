@@ -23,7 +23,7 @@ export default function DynamicBackground() {
   const particlesRef = useRef<Particle[]>([])
   const trailPointsRef = useRef<TrailPoint[]>([])
   const mouseRef = useRef({ x: 0, y: 0 })
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     const canvas = canvasRef.current

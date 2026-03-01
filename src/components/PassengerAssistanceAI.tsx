@@ -57,7 +57,7 @@ export default function PassengerAssistanceAI() {
         preferences: p.preferences
       }))
 
-      const promptText = `You are an AI assistant for cabin crew. Analyze these passengers and generate 3 proactive service recommendations. 
+      const promptText = (window.spark.llmPrompt as any)`You are an AI assistant for cabin crew. Analyze these passengers and generate 3 proactive service recommendations. 
       
 Passengers: ${JSON.stringify(passengersData)}
 
