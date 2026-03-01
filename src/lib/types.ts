@@ -133,3 +133,70 @@ export interface CabinAlert {
   actionRequired?: string
   relatedData?: any
 }
+
+export type ThreatLevel = 'none' | 'low' | 'medium' | 'high' | 'critical'
+export type SecurityEventType = 'suspicious-behavior' | 'unattended-item' | 'restricted-access' | 'aggression' | 'unauthorized-device' | 'biohazard' | 'weapon-detection' | 'cyber-threat'
+export type RobotStatus = 'idle' | 'patrolling' | 'investigating' | 'responding' | 'charging' | 'offline'
+export type RobotType = 'patrol' | 'inspection' | 'medical' | 'security' | 'decontamination'
+
+export interface SecurityEvent {
+  id: string
+  type: SecurityEventType
+  threatLevel: ThreatLevel
+  title: string
+  description: string
+  location: string
+  timestamp: number
+  detectedBy: 'ai' | 'crew' | 'sensor' | 'passenger'
+  status: 'active' | 'investigating' | 'contained' | 'resolved' | 'false-alarm'
+  assignedRobots?: string[]
+  evidence?: {
+    images?: string[]
+    video?: string[]
+    sensorData?: any
+  }
+  response?: {
+    actions: string[]
+    respondedBy: string[]
+    resolvedAt?: number
+  }
+}
+
+export interface SecurityRobot {
+  id: string
+  name: string
+  type: RobotType
+  status: RobotStatus
+  battery: number
+  location: string
+  currentTask?: string
+  capabilities: string[]
+  lastMaintenance: number
+  coordinates?: {
+    x: number
+    y: number
+    z: number
+  }
+  speed?: number
+  assignedZone?: string
+}
+
+export interface ThreatAssessment {
+  overallThreatLevel: ThreatLevel
+  activeThreats: number
+  containedThreats: number
+  falseAlarms: number
+  aiConfidence: number
+  lastUpdated: number
+  recommendations: string[]
+}
+
+export interface BiometricScan {
+  passengerId: string
+  timestamp: number
+  temperature: number
+  heartRate?: number
+  stressLevel?: 'normal' | 'elevated' | 'high'
+  behaviorFlags?: string[]
+  riskScore: number
+}

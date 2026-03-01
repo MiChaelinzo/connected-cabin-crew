@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { House, Users, Package, Warning, UsersFour, WifiHigh, WifiSlash, CloudArrowUp, ChartBar } from '@phosphor-icons/react'
+import { House, Users, Package, Warning, UsersFour, WifiHigh, WifiSlash, CloudArrowUp, ChartBar, ShieldCheck } from '@phosphor-icons/react'
 import { Toaster } from '@/components/ui/sonner'
 import DashboardView from '@/components/views/DashboardView'
 import PassengersView from '@/components/views/PassengersView'
@@ -9,6 +9,7 @@ import InventoryView from '@/components/views/InventoryView'
 import ReportsView from '@/components/views/ReportsView'
 import CrewView from '@/components/views/CrewView'
 import AnalyticsView from '@/components/views/AnalyticsView'
+import SecurityView from '@/components/views/SecurityView'
 import AlertCenter from '@/components/AlertCenter'
 import DynamicBackground from '@/components/DynamicBackground'
 import AIChatbot from '@/components/AIChatbot'
@@ -190,10 +191,10 @@ function App() {
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-[calc(100vh-73px)]">
-        <TabsList className="flex items-center justify-start w-full h-auto gap-1 p-2 border-b rounded-none bg-background border-border">
+        <TabsList className="flex items-center justify-start w-full h-auto gap-1 p-2 border-b rounded-none bg-background border-border overflow-x-auto">
           <TabsTrigger
             value="dashboard"
-            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
+            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg whitespace-nowrap"
           >
             <House className="w-5 h-5" weight="fill" />
             <span className="hidden sm:inline">Dashboard</span>
@@ -201,7 +202,7 @@ function App() {
 
           <TabsTrigger
             value="passengers"
-            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
+            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg whitespace-nowrap"
           >
             <Users className="w-5 h-5" weight="fill" />
             <span className="hidden sm:inline">Passengers</span>
@@ -209,7 +210,7 @@ function App() {
 
           <TabsTrigger
             value="inventory"
-            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
+            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg whitespace-nowrap"
           >
             <Package className="w-5 h-5" weight="fill" />
             <span className="hidden sm:inline">Inventory</span>
@@ -217,7 +218,7 @@ function App() {
 
           <TabsTrigger
             value="reports"
-            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
+            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg whitespace-nowrap"
           >
             <Warning className="w-5 h-5" weight="fill" />
             <span className="hidden sm:inline">Reports</span>
@@ -225,15 +226,23 @@ function App() {
 
           <TabsTrigger
             value="crew"
-            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
+            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg whitespace-nowrap"
           >
             <UsersFour className="w-5 h-5" weight="fill" />
             <span className="hidden sm:inline">Crew</span>
           </TabsTrigger>
 
           <TabsTrigger
+            value="security"
+            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg whitespace-nowrap"
+          >
+            <ShieldCheck className="w-5 h-5" weight="fill" />
+            <span className="hidden sm:inline">Security</span>
+          </TabsTrigger>
+
+          <TabsTrigger
             value="analytics"
-            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
+            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg whitespace-nowrap"
           >
             <ChartBar className="w-5 h-5" weight="fill" />
             <span className="hidden sm:inline">Analytics</span>
@@ -259,6 +268,10 @@ function App() {
 
           <TabsContent value="crew" className="m-0">
             <CrewView />
+          </TabsContent>
+
+          <TabsContent value="security" className="m-0">
+            <SecurityView />
           </TabsContent>
 
           <TabsContent value="analytics" className="m-0">
