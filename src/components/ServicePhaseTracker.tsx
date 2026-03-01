@@ -18,7 +18,7 @@ import { toast } from 'sonner'
 interface ServicePhase {
   id: string
   name: string
-  icon: typeof ForkKnife
+  iconName: 'ForkKnife' | 'Coffee'
   status: 'pending' | 'in-progress' | 'completed'
   startTime?: number
   endTime?: number
@@ -33,7 +33,7 @@ export default function ServicePhaseTracker() {
     {
       id: 'meal-service',
       name: 'Meal Service',
-      icon: ForkKnife,
+      iconName: 'ForkKnife',
       status: 'pending',
       estimatedDuration: 45,
       zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
@@ -41,7 +41,7 @@ export default function ServicePhaseTracker() {
     {
       id: 'beverage-service',
       name: 'Beverage Service',
-      icon: Coffee,
+      iconName: 'Coffee',
       status: 'pending',
       estimatedDuration: 30,
       zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
@@ -137,6 +137,17 @@ export default function ServicePhaseTracker() {
     }
   }
 
+  const getPhaseIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'ForkKnife':
+        return ForkKnife
+      case 'Coffee':
+        return Coffee
+      default:
+        return ForkKnife
+    }
+  }
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -151,7 +162,7 @@ export default function ServicePhaseTracker() {
       <CardContent className="space-y-4">
         {servicePhases && servicePhases.length > 0 ? (
           servicePhases.map(phase => {
-            const Icon = phase.icon
+            const Icon = getPhaseIcon(phase.iconName)
             const progress = getPhaseProgress(phase)
             const time = getPhaseTime(phase)
             const isOvertime = phase.status === 'in-progress' && time > phase.estimatedDuration
