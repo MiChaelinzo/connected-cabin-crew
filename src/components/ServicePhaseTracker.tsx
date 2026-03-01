@@ -10,7 +10,14 @@ import {
   CheckCircle,
   PlayCircle,
   PauseCircle,
-  TrendUp
+  TrendUp,
+  ShoppingCart,
+  Newspaper,
+  Broom,
+  Bed,
+  FirstAid,
+  ShoppingBag,
+  Tray
 } from '@phosphor-icons/react'
 import { useKV } from '@github/spark/hooks'
 import { toast } from 'sonner'
@@ -18,7 +25,7 @@ import { toast } from 'sonner'
 interface ServicePhase {
   id: string
   name: string
-  iconName: 'ForkKnife' | 'Coffee'
+  iconName: 'ForkKnife' | 'Coffee' | 'ShoppingCart' | 'Newspaper' | 'Broom' | 'Bed' | 'FirstAid' | 'ShoppingBag' | 'Tray'
   status: 'pending' | 'in-progress' | 'completed'
   startTime?: number
   endTime?: number
@@ -31,8 +38,24 @@ interface ServicePhase {
 export default function ServicePhaseTracker() {
   const [servicePhases, setServicePhases] = useKV<ServicePhase[]>('service-phases', [
     {
+      id: 'pre-departure',
+      name: 'Pre-Departure Check',
+      iconName: 'Tray',
+      status: 'pending',
+      estimatedDuration: 15,
+      zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
+    },
+    {
+      id: 'welcome-service',
+      name: 'Welcome Service',
+      iconName: 'Coffee',
+      status: 'pending',
+      estimatedDuration: 20,
+      zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
+    },
+    {
       id: 'meal-service',
-      name: 'Meal Service',
+      name: 'Main Meal Service',
       iconName: 'ForkKnife',
       status: 'pending',
       estimatedDuration: 45,
@@ -40,8 +63,48 @@ export default function ServicePhaseTracker() {
     },
     {
       id: 'beverage-service',
-      name: 'Beverage Service',
+      name: 'Beverage Round',
       iconName: 'Coffee',
+      status: 'pending',
+      estimatedDuration: 25,
+      zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
+    },
+    {
+      id: 'duty-free-service',
+      name: 'Duty-Free Sales',
+      iconName: 'ShoppingCart',
+      status: 'pending',
+      estimatedDuration: 35,
+      zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
+    },
+    {
+      id: 'reading-materials',
+      name: 'Reading Materials',
+      iconName: 'Newspaper',
+      status: 'pending',
+      estimatedDuration: 15,
+      zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
+    },
+    {
+      id: 'cabin-rest',
+      name: 'Cabin Rest Period',
+      iconName: 'Bed',
+      status: 'pending',
+      estimatedDuration: 120,
+      zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
+    },
+    {
+      id: 'pre-landing-service',
+      name: 'Pre-Landing Service',
+      iconName: 'Coffee',
+      status: 'pending',
+      estimatedDuration: 20,
+      zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
+    },
+    {
+      id: 'cabin-cleanup',
+      name: 'Cabin Preparation',
+      iconName: 'Broom',
       status: 'pending',
       estimatedDuration: 30,
       zones: { 'Zone A': 'pending', 'Zone B': 'pending', 'Zone C': 'pending' }
@@ -143,6 +206,20 @@ export default function ServicePhaseTracker() {
         return ForkKnife
       case 'Coffee':
         return Coffee
+      case 'ShoppingCart':
+        return ShoppingCart
+      case 'Newspaper':
+        return Newspaper
+      case 'Broom':
+        return Broom
+      case 'Bed':
+        return Bed
+      case 'FirstAid':
+        return FirstAid
+      case 'ShoppingBag':
+        return ShoppingBag
+      case 'Tray':
+        return Tray
       default:
         return ForkKnife
     }
@@ -155,11 +232,11 @@ export default function ServicePhaseTracker() {
           <TrendUp className="w-5 h-5 text-accent" weight="fill" />
           Service Progress
           <Badge variant="outline" className="ml-auto font-mono text-xs">
-            Real-Time
+            {servicePhases?.filter(p => p.status === 'completed').length || 0}/{servicePhases?.length || 0} Complete
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 max-h-[600px] overflow-y-auto">
         {servicePhases && servicePhases.length > 0 ? (
           servicePhases.map(phase => {
             const Icon = getPhaseIcon(phase.iconName)
@@ -170,7 +247,7 @@ export default function ServicePhaseTracker() {
             return (
               <div 
                 key={phase.id}
-                className="flex flex-col gap-3 p-4 rounded-lg border bg-card"
+                className="flex flex-col gap-3 p-4 rounded-lg border bg-card hover:shadow-sm transition-shadow"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
