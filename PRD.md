@@ -68,6 +68,13 @@ This platform addresses multiple interconnected operational domains—passenger 
 - **Progression**: Sensor reading exceeds threshold OR Passenger event occurs OR Inventory crosses threshold → Alert generation engine evaluates conditions → Alert created with category (safety/medical/equipment/passenger/service), priority (critical/high/medium/low), location, and recommended actions → Alert dispatched to notification system → Crew receives alert via sound + visual + toast → Crew responds
 - **Success criteria**: All sensor anomalies generate alerts within 3 seconds; passenger events trigger alerts within 1 second; inventory alerts trigger immediately upon threshold breach; alert messages include specific location and actionable guidance; 95%+ crew satisfaction with alert relevance and timing; measurable reduction in incident discovery time
 
+### Visual Consumption Analytics
+- **Functionality**: Comprehensive analytics dashboard with real-time tracking of inventory consumption patterns, trend visualization, category breakdowns, flight phase analysis, and AI-powered predictive insights; automatically tracks all inventory changes and builds historical consumption data for analysis
+- **Purpose**: Enables data-driven inventory optimization, identifies consumption patterns across flight phases, predicts stock depletion, surfaces surplus inventory, and provides actionable recommendations for future flight planning; helps optimize aircraft loading and reduce waste
+- **Trigger**: Automatically runs in background tracking all inventory changes; crew accesses analytics dashboard via dedicated tab; consumption data persists between sessions
+- **Progression**: Crew opens Analytics tab → Views summary statistics (total consumed, active categories, items tracked, current phase) → Explores trend charts showing cumulative consumption over time → Reviews category distribution via pie charts and top consumed items → Analyzes consumption patterns by flight phase with bar charts and breakdowns → Reviews AI-generated predictive insights (depletion warnings, surplus alerts, optimization suggestions) with severity indicators → Crew uses insights to adjust service strategy or plan future flights
+- **Success criteria**: 100% of inventory changes tracked automatically; consumption data visualized within 1 second of tab access; trend analysis available for all consumed items; predictive insights accuracy >85%; crew can identify consumption patterns and optimize loading decisions; measurable reduction in inventory waste and stockouts on future flights
+
 ## Edge Case Handling
 
 - **Emergency Situations** - Critical safety alerts override all other notifications with distinct visual/audio signals; emergency protocols accessible within two taps
@@ -124,7 +131,7 @@ Animations should reinforce system responsiveness and state changes without dela
 ## Component Selection
 
 - **Components**: 
-  - Navigation: Tabs component for main feature areas (Dashboard, Passengers, Inventory, Reports, Crew)
+  - Navigation: Tabs component for main feature areas (Dashboard, Passengers, Inventory, Reports, Crew, Analytics)
   - Status Display: Card components with Badge overlays for cabin zone status; Alert components for notifications
   - Data Entry: Form components with Input, Select, Textarea, and Checkbox for incident reporting and logging
   - Passenger Search: Command component for quick passenger lookup; Dialog for detailed passenger profiles
@@ -132,6 +139,7 @@ Animations should reinforce system responsiveness and state changes without dela
   - Lists: Table component for inventory; custom Card-based lists for passengers and incidents
   - Feedback: Toast notifications (via Sonner) for confirmations; Progress bars for sync status
   - Media: Avatar for crew and passenger profiles; inline image upload for incident photos
+  - Charts: Recharts library for consumption analytics (LineChart for trends, BarChart for phase analysis, PieChart for category distribution)
 
 - **Customizations**: 
   - Custom cabin seat map visualization using SVG and interactive zones
@@ -148,10 +156,11 @@ Animations should reinforce system responsiveness and state changes without dela
 
 - **Icon Selection**: 
   - Phosphor icons throughout for consistency
-  - Navigation: House (Dashboard), Users (Passengers), Package (Inventory), Warning (Reports), UsersFour (Crew)
+  - Navigation: House (Dashboard), Users (Passengers), Package (Inventory), Warning (Reports), UsersFour (Crew), ChartBar (Analytics)
   - Actions: Plus (Add), MagnifyingGlass (Search), PaperPlaneRight (Send), CheckCircle (Complete), X (Close/Cancel)
   - Status: WifiHigh/WifiSlash (Connectivity), CloudArrowUp (Syncing), WarningCircle (Alert), CheckCircle (Success)
   - Cabin: Seat, FirstAid, ForkKnife, ShoppingCart, Bell
+  - Analytics: TrendUp (Trends), Lightbulb (Insights), Clock (Phases), ChartBarHorizontal (Charts)
 
 - **Spacing**: 
   - Container padding: px-6 py-4 for main content areas; px-4 py-3 for cards

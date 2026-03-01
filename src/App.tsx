@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { House, Users, Package, Warning, UsersFour, WifiHigh, WifiSlash, CloudArrowUp } from '@phosphor-icons/react'
+import { House, Users, Package, Warning, UsersFour, WifiHigh, WifiSlash, CloudArrowUp, ChartBar } from '@phosphor-icons/react'
 import { Toaster } from '@/components/ui/sonner'
 import DashboardView from '@/components/views/DashboardView'
 import PassengersView from '@/components/views/PassengersView'
 import InventoryView from '@/components/views/InventoryView'
 import ReportsView from '@/components/views/ReportsView'
 import CrewView from '@/components/views/CrewView'
+import AnalyticsView from '@/components/views/AnalyticsView'
 import AlertCenter from '@/components/AlertCenter'
 import { useAlertMonitor } from '@/hooks/use-alert-monitor'
 import { useAutomatedAlerts } from '@/hooks/use-automated-alerts'
 import { useInventoryMonitor } from '@/hooks/use-inventory-monitor'
+import { useConsumptionTracker } from '@/hooks/use-consumption-tracker'
 import type { SyncStatus, FlightInfo } from '@/lib/types'
 
 function App() {
@@ -33,6 +35,7 @@ function App() {
   useAlertMonitor()
   useAutomatedAlerts()
   useInventoryMonitor()
+  useConsumptionTracker()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -196,6 +199,14 @@ function App() {
             <UsersFour className="w-5 h-5" weight="fill" />
             <span className="hidden sm:inline">Crew</span>
           </TabsTrigger>
+
+          <TabsTrigger
+            value="analytics"
+            className="flex items-center gap-2 px-4 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"
+          >
+            <ChartBar className="w-5 h-5" weight="fill" />
+            <span className="hidden sm:inline">Analytics</span>
+          </TabsTrigger>
         </TabsList>
 
         <div className="flex-1 overflow-y-auto">
@@ -217,6 +228,10 @@ function App() {
 
           <TabsContent value="crew" className="m-0">
             <CrewView />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="m-0">
+            <AnalyticsView />
           </TabsContent>
         </div>
       </Tabs>
