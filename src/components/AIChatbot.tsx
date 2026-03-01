@@ -68,9 +68,9 @@ export default function AIChatbot() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const quickActions: QuickAction[] = [
     {
@@ -132,9 +132,7 @@ export default function AIChatbot() {
   ]
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   useEffect(() => {
@@ -425,118 +423,121 @@ Provide a helpful, detailed response focused on cabin operations support.`
                 </div>
               </div>
 
-              <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-                <div className="space-y-4">
-                  {(!messages || messages.length === 0) && (
-                    <div className="flex flex-col items-center justify-center text-center py-8">
-                      <div className="p-4 bg-primary/10 rounded-full mb-4">
-                        <ChatCircleDots className="w-12 h-12 text-primary" weight="fill" />
-                      </div>
-                      <h4 className="font-semibold text-foreground mb-2">AI Assistant Ready</h4>
-                      <p className="text-sm text-muted-foreground max-w-xs mb-6">
-                        I can help you with tickets, documents, images, videos, and cabin operations. Upload files or ask me anything!
-                      </p>
-                      
-                      <div className="w-full space-y-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Lightning className="w-4 h-4 text-accent" weight="fill" />
-                          <span className="text-xs font-semibold text-foreground uppercase tracking-wide">Quick Actions</span>
+              <div className="flex-1 overflow-hidden">
+                <ScrollArea className="h-full">
+                  <div className="p-4 space-y-4">
+                    {(!messages || messages.length === 0) && (
+                      <div className="flex flex-col items-center justify-center text-center py-8">
+                        <div className="p-4 bg-primary/10 rounded-full mb-4">
+                          <ChatCircleDots className="w-12 h-12 text-primary" weight="fill" />
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          {quickActions.map((action) => (
-                            <motion.button
-                              key={action.id}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => handleQuickAction(action)}
-                              className="flex flex-col items-start gap-2 p-3 bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 border border-border rounded-lg transition-all duration-200 text-left group"
-                            >
-                              <div className="flex items-center gap-2 w-full">
-                                <div className="p-1.5 bg-primary/10 group-hover:bg-primary/20 rounded-md transition-colors">
-                                  {action.icon}
-                                </div>
-                              </div>
-                              <span className="text-xs font-medium text-foreground line-clamp-2">
-                                {action.label}
-                              </span>
-                            </motion.button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {messages && messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={cn(
-                        'flex gap-3',
-                        message.role === 'user' ? 'justify-end' : 'justify-start'
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          'max-w-[85%] rounded-2xl px-4 py-3',
-                          message.role === 'user'
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted text-foreground'
-                        )}
-                      >
-                        {message.attachments && message.attachments.length > 0 && (
-                          <div className="space-y-2 mb-3">
-                            {message.attachments.map((attachment) => (
-                              <div
-                                key={attachment.id}
-                                className={cn(
-                                  'flex items-center gap-2 p-2 rounded-lg',
-                                  message.role === 'user' ? 'bg-primary-foreground/10' : 'bg-background/50'
-                                )}
+                        <h4 className="font-semibold text-foreground mb-2">AI Assistant Ready</h4>
+                        <p className="text-sm text-muted-foreground max-w-xs mb-6">
+                          I can help you with tickets, documents, images, videos, and cabin operations. Upload files or ask me anything!
+                        </p>
+                        
+                        <div className="w-full space-y-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Lightning className="w-4 h-4 text-accent" weight="fill" />
+                            <span className="text-xs font-semibold text-foreground uppercase tracking-wide">Quick Actions</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {quickActions.map((action) => (
+                              <motion.button
+                                key={action.id}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleQuickAction(action)}
+                                className="flex flex-col items-start gap-2 p-3 bg-gradient-to-br from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 border border-border rounded-lg transition-all duration-200 text-left group"
                               >
-                                {attachment.preview && (
-                                  <img
-                                    src={attachment.preview}
-                                    alt={attachment.name}
-                                    className="w-12 h-12 object-cover rounded"
-                                  />
-                                )}
-                                {!attachment.preview && (
-                                  <div className="w-12 h-12 flex items-center justify-center bg-background/30 rounded">
-                                    {getAttachmentIcon(attachment.type)}
+                                <div className="flex items-center gap-2 w-full">
+                                  <div className="p-1.5 bg-primary/10 group-hover:bg-primary/20 rounded-md transition-colors">
+                                    {action.icon}
                                   </div>
-                                )}
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs font-medium truncate">{attachment.name}</p>
-                                  <p className="text-xs opacity-70">{formatFileSize(attachment.size)}</p>
                                 </div>
-                              </div>
+                                <span className="text-xs font-medium text-foreground line-clamp-2">
+                                  {action.label}
+                                </span>
+                              </motion.button>
                             ))}
                           </div>
-                        )}
-                        {message.content && (
-                          <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-                        )}
-                        <p className={cn(
-                          'text-xs mt-2 opacity-60',
-                          message.role === 'user' ? 'text-right' : 'text-left'
-                        )}>
-                          {new Date(message.timestamp).toLocaleTimeString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-
-                  {isProcessing && (
-                    <div className="flex justify-start">
-                      <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-muted">
-                        <div className="flex items-center gap-2">
-                          <SpinnerGap className="w-4 h-4 animate-spin" />
-                          <span className="text-sm text-muted-foreground">Analyzing...</span>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
+                    )}
+
+                    {messages && messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={cn(
+                          'flex gap-3',
+                          message.role === 'user' ? 'justify-end' : 'justify-start'
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'max-w-[85%] rounded-2xl px-4 py-3',
+                            message.role === 'user'
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-muted text-foreground'
+                          )}
+                        >
+                          {message.attachments && message.attachments.length > 0 && (
+                            <div className="space-y-2 mb-3">
+                              {message.attachments.map((attachment) => (
+                                <div
+                                  key={attachment.id}
+                                  className={cn(
+                                    'flex items-center gap-2 p-2 rounded-lg',
+                                    message.role === 'user' ? 'bg-primary-foreground/10' : 'bg-background/50'
+                                  )}
+                                >
+                                  {attachment.preview && (
+                                    <img
+                                      src={attachment.preview}
+                                      alt={attachment.name}
+                                      className="w-12 h-12 object-cover rounded"
+                                    />
+                                  )}
+                                  {!attachment.preview && (
+                                    <div className="w-12 h-12 flex items-center justify-center bg-background/30 rounded">
+                                      {getAttachmentIcon(attachment.type)}
+                                    </div>
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium truncate">{attachment.name}</p>
+                                    <p className="text-xs opacity-70">{formatFileSize(attachment.size)}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {message.content && (
+                            <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                          )}
+                          <p className={cn(
+                            'text-xs mt-2 opacity-60',
+                            message.role === 'user' ? 'text-right' : 'text-left'
+                          )}>
+                            {new Date(message.timestamp).toLocaleTimeString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+
+                    {isProcessing && (
+                      <div className="flex justify-start">
+                        <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-muted">
+                          <div className="flex items-center gap-2">
+                            <SpinnerGap className="w-4 h-4 animate-spin" />
+                            <span className="text-sm text-muted-foreground">Analyzing...</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </ScrollArea>
+              </div>
 
               {attachments.length > 0 && (
                 <div className="px-4 py-2 border-t border-border bg-muted/30">
