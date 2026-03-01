@@ -11,6 +11,7 @@ import CrewView from '@/components/views/CrewView'
 import AnalyticsView from '@/components/views/AnalyticsView'
 import AlertCenter from '@/components/AlertCenter'
 import DynamicBackground from '@/components/DynamicBackground'
+import AIChatbot from '@/components/AIChatbot'
 import { useAlertMonitor } from '@/hooks/use-alert-monitor'
 import { useAutomatedAlerts } from '@/hooks/use-automated-alerts'
 import { useInventoryMonitor } from '@/hooks/use-inventory-monitor'
@@ -265,6 +266,7 @@ function App() {
       </Tabs>
       </div>
 
+      <AIChatbot />
       <Toaster />
     </div>
   )

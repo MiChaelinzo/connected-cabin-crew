@@ -48,6 +48,18 @@ This platform addresses multiple interconnected operational domains—passenger 
 - **Success criteria**: 50% reduction in missed task handoffs; improved Crew Effort Score through better workload distribution; faster turnaround through coordinated cabin prep; crew can create and manage unlimited custom service phases tailored to operational needs; 90% of crews find custom phases useful for specialized services
 
 ### Offline-First Sync Engine
+- **Functionality**: Maintains local data cache, detects connection status, queues changes during offline periods, automatically syncs when connectivity returns
+- **Purpose**: Ensures cabin crew can continue working during satellite blackspots without data loss or workflow interruption
+- **Trigger**: Runs continuously in background; displays status indicator; handles offline/online transitions automatically
+- **Progression**: System detects connectivity loss → Switches to offline mode → Queues all changes locally → Notifies crew of offline status → Detects reconnection → Automatically syncs queued changes → Confirms successful sync
+- **Success criteria**: Zero data loss during offline periods; crew unaware of sync complexities; automatic conflict resolution; <3 second sync time for typical flight's offline changes
+
+###AI Operations Assistant
+- **Functionality**: Intelligent chatbot with multimodal input support (text, voice, documents, images, videos) that provides context-aware assistance for cabin crew operations; can analyze tickets, reports, photos, videos, and provide operational guidance; voice recording/transcription for hands-free operation
+- **Purpose**: Provides instant AI-powered support for complex operational questions, document analysis, incident photo interpretation, training video summaries, and procedural guidance without requiring crew to search manuals or contact ground support; reduces cognitive load and decision-making time
+- **Trigger**: Crew clicks floating chat icon (bottom-right corner); can send text messages, record voice notes, or upload files (documents, images, videos) for AI analysis
+- **Progression**: Crew opens chat interface → Types question or records voice message → Optionally attaches files (boarding pass photo, incident image, safety report PDF, training video) → AI analyzes multimodal input and understands cabin operations context → Provides detailed, actionable response with safety-conscious guidance → Crew can follow up with clarifying questions → Chat history persists across sessions → Notification badge alerts crew to new AI responses when chat is closed
+- **Success criteria**: 90% of crew queries answered accurately without human escalation; <5 second response time for text queries; <15 seconds for complex document/image analysis; voice transcription accuracy >95%; crew satisfaction score >4.5/5; measurable reduction in ground support calls for routine operational questions; successful interpretation of common cabin documents (tickets, reports, safety logs)
 - **Functionality**: All core features function without connectivity; data queues locally and syncs automatically when connection restored
 - **Purpose**: Ensures operational continuity during satellite black spots, maintaining crew trust in the platform regardless of network status
 - **Trigger**: Connection drops during flight; crew continues normal operations; connection restores
