@@ -200,3 +200,42 @@ export interface BiometricScan {
   behaviorFlags?: string[]
   riskScore: number
 }
+
+export interface AuthUser {
+  id: string
+  email: string
+  name: string
+  role: 'lead' | 'senior' | 'crew' | 'admin'
+  employeeId: string
+  airline: string
+  certifications: string[]
+  avatar?: string
+  lastLogin?: number
+  preferences?: {
+    language: string
+    notifications: boolean
+    theme?: string
+  }
+}
+
+export interface AuthSession {
+  user: AuthUser
+  token: string
+  refreshToken: string
+  expiresAt: number
+  isOnboarded: boolean
+}
+
+export interface OnboardingProgress {
+  completed: boolean
+  currentStep: number
+  steps: {
+    welcome: boolean
+    profile: boolean
+    training: boolean
+    procedures: boolean
+    systemTour: boolean
+  }
+  startedAt: number
+  completedAt?: number
+}

@@ -1,6 +1,6 @@
 # Cabin Crew Operations Platform - Product Requirements Document
 
-**Experience Qualities**:
+**Mission Statement**: Transform cabin crew operations through an intelligent, offline-first platform that empowers crew with real-time insights, streamlines workflows, and enhances safety while maintaining operational continuity during connectivity disruptions.
 
 **Experience Qualities**:
 1. **Confidence** - Every interaction reinforces crew expertise with authoritative data presentation and reliable offline functionality that never loses information
@@ -9,9 +9,30 @@
 
 **Complexity Level**: Complex Application (advanced functionality, likely with multiple views)
 
-This platform addresses multiple interconnected operational domains—passenger services, cabin monitoring, inventory management, incident reporting, crew coordination, and security monitoring—each requiring distinct data models, workflows, and integration points with broader airline systems. The offline-first architecture adds additional complexity through sync engines, conflict resolution, and state management across connectivity transitions.
+This platform addresses multiple interconnected operational domains—authentication, onboarding, passenger services, cabin monitoring, inventory management, incident reporting, crew coordination, and security monitoring—each requiring distinct data models, workflows, and integration points with broader airline systems. The offline-first architecture adds additional complexity through sync engines, conflict resolution, and state management across connectivity transitions.
 
 ## Essential Features
+
+### Authentication & User Management
+- **Functionality**: Secure login/signup system with email and password authentication, demo mode for testing, session management with JWT tokens
+- **Purpose**: Ensures only authorized crew can access the platform, protects sensitive passenger and operational data, provides seamless user experience across sessions
+- **Trigger**: First-time app launch or session expiration
+- **Progression**: Welcome screen → Login/Signup → Session validation → Access granted → Main dashboard
+- **Success criteria**: 100% authentication success rate; zero unauthorized access; session persistence across page refreshes; automatic token refresh
+
+### Onboarding Experience
+- **Functionality**: Multi-step wizard guiding new users through platform features, training materials, safety procedures, and system orientation
+- **Purpose**: Reduces training time, ensures crew understand critical features before first use, improves adoption rates and user confidence
+- **Trigger**: First login after account creation or when onboarding incomplete
+- **Progression**: Profile review → Feature overview → Training materials → Safety procedures → Platform tour → Completion
+- **Success criteria**: 90% onboarding completion rate; 75% reduction in support queries from new users; improved feature discovery scores
+
+### API Integration Layer
+- **Functionality**: Comprehensive API client with type-safe requests, automatic authentication, offline request queueing, configurable endpoints for all platform features
+- **Purpose**: Enables seamless integration with airline backend systems, maintains data consistency across platforms, supports enterprise deployment
+- **Trigger**: Any data operation (fetch, create, update, delete)
+- **Progression**: Request initiated → Authentication added → Network check → Execute or queue → Response handling → State update
+- **Success criteria**: 99.9% data synchronization accuracy; zero data loss during offline periods; sub-500ms API response times
 
 ### Real-Time Cabin Status Dashboard
 - **Functionality**: Displays live cabin environment status including seat occupancy, equipment health, environmental conditions, and active service phases with color-coded status indicators

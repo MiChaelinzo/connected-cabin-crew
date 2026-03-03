@@ -8,6 +8,21 @@ The Cabin Crew Operations Platform is an intelligent, real-time operational tool
 
 ## ✨ Key Features
 
+### 🔐 **Authentication & Onboarding**
+- Secure login and signup with email/password
+- Comprehensive onboarding wizard for new crew members
+- Demo mode for testing and exploration
+- Session management with automatic token refresh
+- Profile management with airline and role information
+
+### 🌐 **API Integration**
+- RESTful API client with type-safe requests
+- Automatic authentication header injection
+- Request queueing for offline scenarios
+- Configurable endpoints for all platform features
+- Comprehensive error handling and retry logic
+- See [API Integration Guide](./API_INTEGRATION.md) for details
+
 ### 📊 **Real-Time Dashboard**
 - Live cabin status monitoring with visual indicators
 - Flight phase tracking (boarding, taxi, takeoff, cruise, landing, turnaround)
@@ -116,24 +131,30 @@ src/
 │   │   ├── CrewView.tsx
 │   │   ├── SecurityView.tsx
 │   │   └── AnalyticsView.tsx
-│   ├── AIChatbot.tsx          # AI-powered assistant
-│   ├── AlertCenter.tsx        # Centralized alert management
-│   ├── DynamicBackground.tsx  # Phase-aware background
-│   └── [feature components]   # Specialized feature components
+│   ├── WelcomePage.tsx         # Landing/welcome screen
+│   ├── LoginPage.tsx           # Authentication login
+│   ├── SignupPage.tsx          # User registration
+│   ├── OnboardingPage.tsx      # New user onboarding wizard
+│   ├── AIChatbot.tsx           # AI-powered assistant
+│   ├── AlertCenter.tsx         # Centralized alert management
+│   ├── DynamicBackground.tsx   # Phase-aware background
+│   └── [feature components]    # Specialized feature components
 ├── hooks/
-│   ├── use-alert-monitor.ts   # Real-time alert monitoring
+│   ├── use-auth.ts             # Authentication state management
+│   ├── use-alert-monitor.ts    # Real-time alert monitoring
 │   ├── use-consumption-tracker.ts
 │   ├── use-inventory-monitor.ts
-│   └── use-initialize-data.ts # Seed data initialization
+│   └── use-initialize-data.ts  # Seed data initialization
 ├── lib/
-│   ├── types.ts               # TypeScript type definitions
-│   ├── alert-generator.ts     # Automated alert logic
+│   ├── api.ts                  # API client with offline support
+│   ├── types.ts                # TypeScript type definitions
+│   ├── alert-generator.ts      # Automated alert logic
 │   ├── consumption-analytics.ts
-│   ├── sensor-data.ts         # Sensor simulation
-│   └── utils.ts               # Utility functions
-├── App.tsx                    # Main application component
-├── index.css                  # Global styles and theme
-└── main.tsx                   # Application entry point
+│   ├── sensor-data.ts          # Sensor simulation
+│   └── utils.ts                # Utility functions
+├── App.tsx                     # Main application component
+├── index.css                   # Global styles and theme
+└── main.tsx                    # Application entry point
 ```
 
 ## 🎨 Design System
@@ -161,6 +182,29 @@ src/
 
 This is a Spark application that runs in a pre-configured development environment. No installation steps required!
 
+### First Time Setup
+
+1. **Launch the Application**: The welcome page will greet you with an overview of features
+2. **Create Account**: Click "Get Started" to create your crew account
+   - Enter your name, email, employee ID, and airline
+   - Create a secure password (minimum 8 characters)
+3. **Complete Onboarding**: Follow the 5-step onboarding wizard:
+   - Welcome & feature overview
+   - Profile verification
+   - Quick training on essential features
+   - Safety procedures and reporting requirements
+   - Platform tour and quick tips
+4. **Start Using the Platform**: Access all features from the main dashboard
+
+### Demo Mode
+
+For quick testing without creating an account:
+- Click "Login" on the welcome page
+- Click "Try Demo Account"
+- Or use credentials:
+  - Email: `demo@cabin-ops.com`
+  - Password: `demo123`
+
 ### Development
 The application auto-reloads on file changes. View your app in the integrated preview panel.
 
@@ -185,6 +229,8 @@ The application auto-reloads on file changes. View your app in the integrated pr
 
 All application data is stored using the **useKV hook** for offline-first persistence:
 
+- **Authentication & Sessions**: User profiles, tokens, and session state
+- **Onboarding Progress**: Tracking completion status for new users
 - Flight information and current phase
 - Passenger profiles and preferences
 - Inventory levels and consumption history
@@ -197,12 +243,30 @@ Data automatically syncs when connectivity is restored, with conflict resolution
 
 ## 🔐 Security Features
 
+- **JWT-based Authentication**: Secure token-based auth with automatic refresh
+- **Session Management**: Automatic timeout and secure token storage
+- **Role-Based Access**: Different permissions for lead, senior, and crew members
 - Passenger data privacy with secure storage
-- Role-based access patterns
 - Automated security robot monitoring
 - Real-time threat detection and alerts
 - Comprehensive audit logging
-- Session timeout for inactive users
+
+## 🔌 API Integration
+
+The platform includes a comprehensive API client for backend integration:
+
+- **Type-Safe Requests**: Full TypeScript support for all endpoints
+- **Offline Queue**: Automatic request queuing when connection is lost
+- **Auto-Retry Logic**: Configurable retry attempts for failed requests
+- **Authentication**: Automatic token injection for all authenticated requests
+- **Endpoints**: Complete coverage for all platform features
+
+See the [API Integration Guide](./API_INTEGRATION.md) for detailed documentation on:
+- Endpoint specifications
+- Request/response formats
+- Authentication flow
+- Error handling
+- Usage examples
 
 ## 📱 Mobile Responsive
 

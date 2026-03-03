@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { House, Users, Package, Warning, UsersFour, WifiHigh, WifiSlash, CloudArrowUp, ChartBar, ShieldCheck } from '@phosphor-icons/react'
+import { House, Users, Package, Warning, UsersFour, WifiHigh, WifiSlash, CloudArrowUp, ChartBar, ShieldCheck, SignOut } from '@phosphor-icons/react'
 import { Toaster } from '@/components/ui/sonner'
+import { Button } from '@/components/ui/button'
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu'
 import DashboardView from '@/components/views/DashboardView'
 import PassengersView from '@/components/views/PassengersView'
 import InventoryView from '@/components/views/InventoryView'
@@ -13,14 +22,24 @@ import SecurityView from '@/components/views/SecurityView'
 import AlertCenter from '@/components/AlertCenter'
 import DynamicBackground from '@/components/DynamicBackground'
 import AIChatbot from '@/components/AIChatbot'
+import WelcomePage from '@/components/WelcomePage'
+import LoginPage from '@/components/LoginPage'
+import SignupPage from '@/components/SignupPage'
+import OnboardingPage from '@/components/OnboardingPage'
 import { useAlertMonitor } from '@/hooks/use-alert-monitor'
 import { useAutomatedAlerts } from '@/hooks/use-automated-alerts'
 import { useInventoryMonitor } from '@/hooks/use-inventory-monitor'
 import { useConsumptionTracker } from '@/hooks/use-consumption-tracker'
 import { useInitializeData } from '@/hooks/use-initialize-data'
+import { useAuth } from '@/hooks/use-auth'
+import { toast } from 'sonner'
 import type { SyncStatus, FlightInfo } from '@/lib/types'
 
+type AppScreen = 'welcome' | 'login' | 'signup' | 'onboarding' | 'app'
+
 function App() {
+  const auth = useAuth()
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>('welcome')
   const [activeTab, setActiveTab] = useState('dashboard')
   const [syncStatus, setSyncStatus] = useKV<SyncStatus>('sync-status', {
     connectivity: 'online',
@@ -41,6 +60,30 @@ function App() {
   useAutomatedAlerts()
   useInventoryMonitor()
   useConsumptionTracker()
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      if (!auth.isOnboarded) {
+        setCurrentScreen('onboarding')
+      } else {
+        setCurrentScreen('app')
+      }
+    } else {
+      setCurrentScreen('welcome')
+    }
+  }, [auth.isAuthenticated, auth.isOnboarded])
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      if (!auth.isOnboarded) {
+        setCurrentScreen('onboarding')
+      } else {
+        setCurrentScreen('app')
+      }
+    } else {
+      setCurrentScreen('welcome')
+    }
+  }, [auth.isAuthenticated, auth.isOnboarded])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -79,6 +122,62 @@ function App() {
 
     return () => clearInterval(interval)
   }, [setSyncStatus])
+
+  const handleLogin = async (email: string, password: string) => {
+    const result = await auth.login(email, password)
+    
+    if (result.success) {
+      toast.success('Welcome back!')
+      return { success: true }
+    }
+    
+    if (email === 'demo@cabin-ops.com' && password === 'demo123') {
+      const demoUser = {
+        id: 'demo-user-123',
+        email: 'demo@cabin-ops.com',
+        name: 'Demo Crew Member',
+        role: 'crew' as const,
+        employeeId: 'DEMO001',
+        airline: 'Demo Airlines',
+        certifications: ['Safety', 'Medical', 'Service'],
+        preferences: {
+          language: 'en',
+          notifications: true
+        }
+      }
+      
+      auth.updateUser(demoUser)
+      setCurrentScreen('onboarding')
+      toast.success('Welcome to the demo!')
+      return { success: true }
+    }
+    
+    return result
+  }
+
+  const handleSignup = async (
+    name: string,
+    email: string,
+    password: string,
+    employeeId: string,
+    airline: string
+  ) => {
+    const result = await auth.signup(name, email, password, employeeId, airline)
+    
+    if (result.success) {
+      toast.success('Account created successfully!')
+      return { success: true }
+    }
+    
+    return result
+  }
+
+  const handleLogout = async () => {
+    await auth.logout()
+    setCurrentScreen('welcome')
+    setActiveTab('dashboard')
+    toast.success('Logged out successfully')
+  }
 
   const handleManualSync = () => {
     setSyncStatus(current => {
@@ -136,6 +235,48 @@ function App() {
     }
   }
 
+  if (currentScreen === 'welcome') {
+    return (
+      <WelcomePage
+        onGetStarted={() => setCurrentScreen('signup')}
+        onLogin={() => setCurrentScreen('login')}
+      />
+    )
+  }
+
+  if (currentScreen === 'login') {
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onBack={() => setCurrentScreen('welcome')}
+        onSignup={() => setCurrentScreen('signup')}
+      />
+    )
+  }
+
+  if (currentScreen === 'signup') {
+    return (
+      <SignupPage
+        onSignup={handleSignup}
+        onBack={() => setCurrentScreen('welcome')}
+        onLogin={() => setCurrentScreen('login')}
+      />
+    )
+  }
+
+  if (currentScreen === 'onboarding' && auth.user) {
+    return (
+      <OnboardingPage
+        user={auth.user}
+        onComplete={() => {
+          auth.completeOnboarding()
+          setCurrentScreen('app')
+          toast.success('Welcome to Cabin Operations!')
+        }}
+      />
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background relative">
       <DynamicBackground />
@@ -171,6 +312,32 @@ function App() {
               {getConnectivityIcon()}
               <span className="hidden sm:inline">{getConnectivityText()}</span>
             </button>
+            
+            {auth.user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
+                      {auth.user.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <span className="hidden md:inline">{auth.user.name.split(' ')[0]}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{auth.user.name}</p>
+                      <p className="text-xs text-muted-foreground">{auth.user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <SignOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </header>
