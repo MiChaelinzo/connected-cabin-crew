@@ -1,195 +1,184 @@
 export interface ApiConfig {
   baseUrl: string
-      login: s
-      logou
+  endpoints: {
+    auth: {
       login: string
       signup: string
       logout: string
       refresh: string
       validate: string
     }
-    passeng
+    crew: {
       profile: string
       members: string
       tasks: string
-     
+    }
     passengers: {
-      acknowledge:
+      list: string
+      profile: string
+      requests: string
     }
-      events: string
-     
-    analytics: {
-      performance: 
+    inventory: {
+      list: string
+      update: string
+      categories: string
     }
-  timeout: number
-}
-export const def
-  endpoints: {
-      login: '/auth/
-      logout: '/auth
-     
-    crew: {
-      members: '/c
-    },
-      list: '/passeng
-     
-    inventory: 
-      update: '/inve
-    },
-      list: '/inciden
-     
+    incidents: {
+      list: string
+      create: string
+      update: string
+    }
     alerts: {
-      acknowledge: '/aler
-    },
-      events: '/secur
-     
-   
-      performance
+      list: string
+      acknowledge: string
     }
- 
+    security: {
+      events: string
+      threats: string
+    }
+    analytics: {
+      performance: string
+      reports: string
+    }
+  }
+  timeout: number
+  retryAttempts: number
+}
+
+export const defaultApiConfig: ApiConfig = {
+  baseUrl: '/api',
+  endpoints: {
+    auth: {
+      login: '/auth/login',
+      signup: '/auth/signup',
+      logout: '/auth/logout',
+      refresh: '/auth/refresh',
+      validate: '/auth/validate'
+    },
+    crew: {
+      profile: '/crew/profile',
+      members: '/crew/members',
+      tasks: '/crew/tasks'
+    },
+    passengers: {
+      list: '/passengers/list',
+      profile: '/passengers/profile',
+      requests: '/passengers/requests'
+    },
+    inventory: {
+      list: '/inventory/list',
+      update: '/inventory/update',
+      categories: '/inventory/categories'
+    },
+    incidents: {
+      list: '/incidents/list',
+      create: '/incidents/create',
+      update: '/incidents/update'
+    },
+    alerts: {
+      list: '/alerts/list',
+      acknowledge: '/alerts/acknowledge'
+    },
+    security: {
+      events: '/security/events',
+      threats: '/security/threats'
+    },
+    analytics: {
+      performance: '/analytics/performance',
+      reports: '/analytics/reports'
+    }
+  },
+  timeout: 30000,
+  retryAttempts: 3
+}
 
 export interface ApiResponse<T = any> {
+  success: boolean
   data?: T
-  message?: st
+  error?: string
+  message?: string
+  timestamp: number
 }
-export interface QueuedRequ
+
+export interface QueuedRequest {
+  id: string
   endpoint: string
+  method: string
   body?: any
+  timestamp: number
   retries: number
+}
 
-  priv
-  private r
-  constructor(config: ApiConfig
+export class ApiClient {
+  private config: ApiConfig
+  private authToken: string | null = null
+  private requestQueue: QueuedRequest[] = []
+
+  constructor(config: ApiConfig = defaultApiConfig) {
+    this.config = config
   }
-  setAuthToken(token: stri
+
+  setAuthToken(token: string | null) {
+    this.authToken = token
   }
-  getAuthToken():
+
+  getAuthToken(): string | null {
+    return this.authToken
   }
-  private getHeaders(): HeadersIn
-      'Content-Type': 'application/jso
 
-      headers['A
-
-  }
-  private buildUrl(endpoint: string, params
-    
-      Object.key
-      })
-
-  }
-  asyn
-    options: 
-  ): Promise<ApiRespon
-    
-      const controller = new AbortCo
-
-        ...opti
-          ...this.getHeaders(),
-        },
-      })
-      
-      const data
-      if (!response.ok) {
-          success: false,
-          message: data.message,
-     
-
-        success: 
-        timestamp:
- 
-
-
-        success: f
-        ti
+  private getHeaders(): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json'
     }
 
-    const queuedReq
- 
+    if (this.authToken) {
+      headers['Authorization'] = `Bearer ${this.authToken}`
+    }
 
-      retries: 0
-
+    return headers
   }
-  async processQ
 
+  private buildUrl(endpoint: string, params?: Record<string, string>): string {
+    const url = `${this.config.baseUrl}${endpoint}`
+    if (params && Object.keys(params).length > 0) {
+      const queryString = new URLSearchParams(params).toString()
+      return `${url}?${queryString}`
+    }
+    return url
+  }
 
-      try {
- 
+  async request<T = any>(
+    endpoint: string,
+    options: RequestInit = {},
+    params?: Record<string, string>
+  ): Promise<ApiResponse<T>> {
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), this.config.timeout)
 
-        if (!resu
-            ...request,
-          })
-      } catch (error) {
+      const response = await fetch(this.buildUrl(endpoint, params), {
+        ...options,
+        headers: {
+          ...this.getHeaders(),
+          ...options.headers
+        },
+        signal: controller.signal
+      })
 
-            retries: request.retries + 1
+      clearTimeout(timeoutId)
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: data.error || 'Request failed',
+          message: data.message,
+          timestamp: Date.now()
         }
-   
+      }
 
-
-    return this.requestQue
-
-
-
-    return this.request<T
-   
-
-  put<T = any>(endpoint: string, body
-      method: 'PUT',
-    }, params)
-
-
-      body: JSON.stringif
-  }
-  del
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      return {
         success: true,
         data: data,
         timestamp: Date.now()
